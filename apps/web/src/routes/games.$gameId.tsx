@@ -6,6 +6,7 @@ import { AgeRatings, Languages, Links, Multiplayer, PcRequirements, Related, Rel
 import { tr } from "../lib/labels";
 import { requireSession } from "../lib/auth";
 import { useFollows, useFriends, useGame, useSimilar, useToggleFollow, type GameDetail } from "../lib/games";
+import { useActiveSection } from "../lib/use-active-section";
 import { useMyRating, useSetList, useSetRating, useUserLists } from "../lib/library";
 
 export const Route = createFileRoute("/games/$gameId")({
@@ -79,6 +80,7 @@ function GamePage() {
     ...(details ? ["Powiązane"] : []),
     "Podobne gry",
   ];
+  const activeSection = useActiveSection(sections);
   const jumpTo = (_index: number, label: string) =>
     [...document.querySelectorAll("h2")].find((heading) => heading.textContent?.startsWith(label))?.scrollIntoView({ behavior: "smooth", block: "start" });
 
@@ -101,6 +103,7 @@ function GamePage() {
             <div className="fixed top-1/2 left-4 z-40 hidden -translate-y-1/2 min-[1800px]:block">
               <LineSidebar
                 items={sections}
+                active={activeSection}
                 accentColor="var(--primary)"
                 textColor="var(--muted-foreground)"
                 markerColor="var(--input)"

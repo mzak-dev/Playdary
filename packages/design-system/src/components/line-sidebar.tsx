@@ -1,4 +1,4 @@
-// @ts-nocheck vendored from react-bits (DavidHDev/react-bits, Components/LineSidebar)
+// @ts-nocheck vendored from react-bits (DavidHDev/react-bits, Components/LineSidebar), adds optional `active` prop
 import { useRef, useState, useCallback, useEffect, type CSSProperties } from 'react';
 
 type Falloff = 'linear' | 'smooth' | 'sharp';
@@ -21,6 +21,7 @@ export interface LineSidebarProps {
   fontSize?: number;
   smoothing?: number;
   defaultActive?: number | null;
+  active?: number | null;
   onItemClick?: (index: number, label: string) => void;
   className?: string;
 }
@@ -64,6 +65,7 @@ const LineSidebar = ({
   fontSize = 1.1,
   smoothing = 100,
   defaultActive = null,
+  active,
   onItemClick,
   className = ''
 }: LineSidebarProps) => {
@@ -147,6 +149,10 @@ const LineSidebar = ({
     },
     [onItemClick]
   );
+
+  useEffect(() => {
+    if (active !== undefined) setActiveIndex(active);
+  }, [active]);
 
   useEffect(() => {
     startLoop();
