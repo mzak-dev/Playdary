@@ -16,6 +16,7 @@ export { Tag } from "./components/tag";
 export { StatTile } from "./components/stat-tile";
 export { Gallery, type Slide } from "./components/gallery";
 export { GameRow } from "./components/game-row";
+export { EmptyState } from "./components/empty-state";
 export { Switch } from "./components/switch";
 export { PageHero } from "./components/page-hero";
 export { Skeleton } from "./components/skeleton";

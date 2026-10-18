@@ -4,6 +4,7 @@ import { SlidersHorizontal } from "lucide-react";
 import { useMemo, useState } from "react";
 import { AppShell } from "../components/app-shell";
 import { FilterPanel } from "../components/filter-panel";
+import { GameEmptyState } from "../components/game-empty-state";
 import { requireSession } from "../lib/auth";
 import { DEFAULT_FILTERS, TABS, activeFilterCount, type Filters, type TabLabel } from "../lib/filters";
 import { useBrowse, useFollows, useFriends, useTicker, useToggleFollow, useTopUpcoming } from "../lib/games";
@@ -103,7 +104,14 @@ function Home() {
           {filtersOpen && <FilterPanel filters={filters} onChange={setFilters} />}
 
           {browse.error && <p role="alert" className="text-sm font-medium text-destructive">Nie udało się wczytać gier: {browse.error.message}</p>}
-          {browse.data && browseGames.length === 0 && <p className="text-sm text-muted-foreground">Żadna gra nie pasuje do wybranych filtrów.</p>}
+          {browse.data && browseGames.length === 0 && (
+            <GameEmptyState
+              label="Brak wyników"
+              title="Żadna gra nie pasuje do filtrów"
+              text="Spróbuj poluzować kryteria albo wyczyść filtry, żeby wrócić do pełnej listy."
+              action={<Button onClick={() => setFilters({ ...DEFAULT_FILTERS, tab: filters.tab })}>Wyczyść filtry</Button>}
+            />
+          )}
           <div aria-busy={browse.isFetching} className={`grid grid-cols-[repeat(auto-fill,minmax(270px,1fr))] gap-6 transition-opacity ${browse.isPlaceholderData ? "opacity-60" : ""}`}>
             {browse.isPending ? skeletons(8) : browseGames.map((game) => card(game))}
             {browse.isFetchingNextPage && skeletons(4)}

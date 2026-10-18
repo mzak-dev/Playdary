@@ -2,6 +2,7 @@ import { Button, GameRow, PageHero, SegmentedControl, Skeleton, Tag, type GameLi
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { AppShell } from "../components/app-shell";
+import { GameEmptyState } from "../components/game-empty-state";
 import { requireSession } from "../lib/auth";
 import { useFriends } from "../lib/games";
 import { useListedGames, useSetList, useUserLists } from "../lib/library";
@@ -91,12 +92,13 @@ function Lists() {
         )}
 
         {!pending && visible.length === 0 && (
-          <div className="mx-auto flex max-w-md flex-col items-center gap-4 rounded-lg bg-secondary/60 p-8 text-center">
-            <Tag>{filter}</Tag>
-            <p className="font-display text-xl leading-[26px] font-bold">{empty.title}</p>
-            <p className="text-sm leading-5 text-muted-foreground">{empty.text}</p>
-            <Button onClick={() => navigate({ to: "/" })}>Przeglądaj popularne</Button>
-          </div>
+          <GameEmptyState
+            key={active}
+            label={filter}
+            title={empty.title}
+            text={empty.text}
+            action={<Button onClick={() => navigate({ to: "/" })}>Przeglądaj popularne</Button>}
+          />
         )}
 
         <div className="flex flex-col gap-1">
