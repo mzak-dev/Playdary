@@ -37,6 +37,7 @@ type IgdbGame = {
   platforms?: { abbreviation?: string; name?: string }[];
   first_release_date?: number;
   total_rating?: number;
+  total_rating_count?: number;
   follows?: number;
   hypes?: number;
 };
@@ -58,7 +59,7 @@ async function fetchPage(token: string, offset: number, { where, sort } = POPULA
   const response = await fetch("https://api.igdb.com/v4/games", {
     method: "POST",
     headers: { "Client-ID": env("TWITCH_CLIENT_ID"), Authorization: `Bearer ${token}` },
-    body: `fields name,summary,storyline,cover.image_id,screenshots.image_id,videos.video_id,genres.name,themes.name,platforms.abbreviation,platforms.name,first_release_date,total_rating,follows,hypes;
+    body: `fields name,summary,storyline,cover.image_id,screenshots.image_id,videos.video_id,genres.name,themes.name,platforms.abbreviation,platforms.name,first_release_date,total_rating,total_rating_count,follows,hypes;
       where ${where};
       sort ${sort};
       limit ${PAGE_SIZE}; offset ${offset};`,
@@ -70,6 +71,7 @@ async function fetchPage(token: string, offset: number, { where, sort } = POPULA
 const toRow = (game: IgdbGame) => ({
   id: game.id,
   name: game.name,
+  rating_count: game.total_rating_count ?? null,
   data: {
     summary: game.summary ?? null,
     storyline: game.storyline ?? null,
@@ -88,7 +90,7 @@ const toRow = (game: IgdbGame) => ({
 
 async function seedGames() {
   const { count } = await supabase.from("games").select("id", { count: "exact", head: true });
-  if ((count ?? 0) >= TARGET) return;
+  if (!process.env.SEED_REFRESH && (count ?? 0) >= TARGET) return;
   const token = await twitchToken();
   for (let offset = 0; offset < TARGET; offset += PAGE_SIZE) {
     const games = await fetchPage(token, offset);

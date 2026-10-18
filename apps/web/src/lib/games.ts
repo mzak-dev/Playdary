@@ -1,9 +1,8 @@
 import type { Friend, Game } from "@playdary/design-system";
-import { keepPreviousData, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { keepPreviousData, useInfiniteQuery, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { toRpcParams, type Filters } from "./filters";
+import { polishTags } from "./labels";
 import { supabase } from "./supabase";
-
-export const BROWSE_TABS = ["Popularne", "Nadchodzące premiery", "Najlepiej oceniane"] as const;
-export type BrowseTab = (typeof BROWSE_TABS)[number];
 
 type GameRow = {
   id: number;
@@ -13,16 +12,19 @@ type GameRow = {
   release_date: number | null;
   cover: string | null;
   genres: string[] | null;
+  themes: string[] | null;
   platforms: string[] | null;
 };
 
-const COLUMNS = "id, name, hypes, score, release_date, cover:data->>cover, genres:data->genres, platforms:data->platforms";
-const BROWSE_LIMIT = 24;
+const COLUMNS =
+  "id, name, hypes, score, release_date, cover:data->>cover, genres:data->genres, themes:data->themes, platforms:data->platforms";
+const PAGE_SIZE = 24;
+const STALE_TIME = 5 * 60_000;
 
 const toGame = (row: GameRow): Game => ({
   id: row.id,
   title: row.name,
-  genres: row.genres ?? [],
+  genres: polishTags(row.themes, row.genres),
   platforms: row.platforms ?? [],
   releaseDate: row.release_date,
   score: row.score === null ? null : Math.round(row.score),
@@ -39,14 +41,6 @@ const toGames = ({ data, error }: Result) => {
 
 const games = () => supabase.from("games").select(COLUMNS);
 
-const browseQuery: Record<BrowseTab, () => PromiseLike<Result>> = {
-  Popularne: () => games().order("hypes", { ascending: false }).order("score", { ascending: false, nullsFirst: false }).limit(BROWSE_LIMIT),
-  "Nadchodzące premiery": () => games().gt("release_date", Date.now()).order("release_date").limit(BROWSE_LIMIT),
-  "Najlepiej oceniane": () => games().not("score", "is", null).order("score", { ascending: false }).limit(BROWSE_LIMIT),
-};
-
-const STALE_TIME = 5 * 60_000;
-
 export const useTopUpcoming = () =>
   useQuery({
     queryKey: ["games", "top-upcoming"],
@@ -61,10 +55,25 @@ export const useTicker = () =>
     queryFn: async () => toGames(await games().gt("release_date", Date.now()).order("release_date").limit(20)),
   });
 
-export const useBrowse = (tab: BrowseTab) =>
-  useQuery({ queryKey: ["games", "browse", tab], staleTime: STALE_TIME, queryFn: async () => toGames(await browseQuery[tab]()) });
+export const useBrowse = (filters: Filters) =>
+  useInfiniteQuery({
+    queryKey: ["games", "browse", filters],
+    initialPageParam: 0,
+    staleTime: STALE_TIME,
+    placeholderData: keepPreviousData,
+    queryFn: async ({ pageParam }) => {
+      const { data, error } = await supabase.rpc("browse_games", { ...toRpcParams(filters), p_limit: PAGE_SIZE, p_offset: pageParam });
+      if (error) throw new Error(error.message);
+      const rows = data as (GameRow & { total: number })[];
+      return { games: rows.map(toGame), total: rows[0]?.total ?? 0 };
+    },
+    getNextPageParam: (last, pages) => {
+      const loaded = pages.reduce((count, page) => count + page.games.length, 0);
+      return loaded < last.total ? loaded : undefined;
+    },
+  });
 
-type SearchRow = { id: number; name: string; data: { cover: string | null; genres: string[]; platforms: string[] } };
+type SearchRow = { id: number; name: string; data: { cover: string | null; genres: string[]; themes: string[]; platforms: string[] } };
 
 export const useSearch = (query: string) =>
   useQuery({
@@ -77,7 +86,7 @@ export const useSearch = (query: string) =>
       return (data as SearchRow[]).map((row) => ({
         id: row.id,
         title: row.name,
-        genres: row.data.genres,
+        genres: polishTags(row.data.themes, row.data.genres),
         platforms: row.data.platforms,
         releaseDate: null,
         score: null,

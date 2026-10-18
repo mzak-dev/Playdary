@@ -1,9 +1,12 @@
-import { GameCard, NavBar, QuoteHero, Rail, ReleaseTicker, SegmentedControl, type Game } from "@playdary/design-system";
+import { Button, GameCard, GameCardSkeleton, NavBar, QuoteHero, Rail, ReleaseTicker, SegmentedControl, Skeleton, type Game } from "@playdary/design-system";
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { SlidersHorizontal } from "lucide-react";
 import { useMemo, useState } from "react";
+import { FilterPanel } from "../components/filter-panel";
 import { requireSession } from "../lib/auth";
-import { BROWSE_TABS, useBrowse, useFollows, useFriends, useSearch, useTicker, useToggleFollow, useTopUpcoming, type BrowseTab } from "../lib/games";
+import { DEFAULT_FILTERS, TABS, activeFilterCount, type Filters, type TabLabel } from "../lib/filters";
+import { useBrowse, useFollows, useFriends, useSearch, useTicker, useToggleFollow, useTopUpcoming } from "../lib/games";
 import { supabase } from "../lib/supabase";
 import { useDebounced } from "../lib/use-debounced";
 import { quotes } from "../quotes";
@@ -18,12 +21,10 @@ const NAV_LINKS = [
   { id: "lists", label: "Moje listy", short: "Listy" },
 ];
 
-const Status = ({ pending, error, empty }: { pending: boolean; error: Error | null; empty: boolean }) => {
-  if (error) return <p role="alert" className="text-sm font-medium text-destructive">Nie udało się wczytać gier: {error.message}</p>;
-  if (pending) return <p className="text-sm text-muted-foreground">Ładowanie…</p>;
-  if (empty) return <p className="text-sm text-muted-foreground">Brak gier do pokazania.</p>;
-  return null;
-};
+const TAB_LABELS = TABS.map((tab) => tab.label);
+const skeletons = (count: number, className?: string) => Array.from({ length: count }, (_, i) => <GameCardSkeleton key={i} className={className} />);
+
+const gamesCount = (n: number) => `${n.toLocaleString("pl-PL")} ${n === 1 ? "gra" : n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 12 || n % 100 > 14) ? "gry" : "gier"}`;
 
 function Home() {
   const { session } = Route.useRouteContext();
@@ -35,16 +36,20 @@ function Home() {
   });
   const user = profile?.username ?? session.user.email?.split("@")[0] ?? "";
 
-  const [tab, setTab] = useState<BrowseTab>("Popularne");
+  const [filters, setFilters] = useState<Filters>(DEFAULT_FILTERS);
+  const [filtersOpen, setFiltersOpen] = useState(false);
   const [query, setQuery] = useState("");
   const top = useTopUpcoming();
   const ticker = useTicker();
-  const browse = useBrowse(tab);
+  const browse = useBrowse(filters);
   const search = useSearch(useDebounced(query.trim()));
   const follows = useFollows(userId);
   const toggleFollow = useToggleFollow(userId);
 
-  const visibleIds = useMemo(() => [...new Set([...(top.data ?? []), ...(browse.data ?? [])].map((g) => g.id))].sort((a, b) => a - b), [top.data, browse.data]);
+  const browseGames = useMemo(() => browse.data?.pages.flatMap((page) => page.games) ?? [], [browse.data]);
+  const total = browse.data?.pages[0]?.total ?? 0;
+  const activeCount = activeFilterCount(filters);
+  const visibleIds = useMemo(() => [...new Set([...(top.data ?? []), ...browseGames].map((g) => g.id))].sort((a, b) => a - b), [top.data, browseGames]);
   const friends = useFriends(visibleIds).data;
 
   const signOut = async () => {
@@ -78,22 +83,56 @@ function Home() {
       />
 
       <QuoteHero user={user} quotes={quotes}>
-        {ticker.data && ticker.data.length > 0 && <ReleaseTicker games={ticker.data} />}
+        {ticker.data ? (
+          ticker.data.length > 0 && <ReleaseTicker games={ticker.data} />
+        ) : (
+          <div aria-hidden className="flex gap-1.5 overflow-hidden px-4 py-1.5 sm:px-8">
+            {Array.from({ length: 5 }, (_, i) => (
+              <Skeleton key={i} className="h-9 w-64 shrink-0 rounded-full" />
+            ))}
+          </div>
+        )}
       </QuoteHero>
 
       <div className="relative z-[3] -mt-[72px] flex min-h-[55vh] flex-col gap-14 rounded-t-xl border border-b-0 border-white/5 bg-card/70 px-4 pt-10 pb-18 shadow-[inset_0_1px_0_rgba(255,255,255,0.06),0_-24px_60px_rgba(0,0,0,0.35)] backdrop-blur-xl sm:px-8">
         <Rail title="Najbardziej wyczekiwane" subtitle="Top 10 nadchodzących gier według liczby obserwujących w IGDB, z odliczaniem do premiery.">
-          {top.data?.map((game, i) => card(game, i + 1, "w-[300px] shrink-0"))}
+          {top.isPending ? skeletons(5, "w-[300px] shrink-0") : top.data?.map((game, i) => card(game, i + 1, "w-[300px] shrink-0"))}
         </Rail>
-        <Status pending={top.isPending} error={top.error} empty={top.data?.length === 0} />
+        {top.error && <p role="alert" className="text-sm font-medium text-destructive">Nie udało się wczytać gier: {top.error.message}</p>}
 
         <section className="flex flex-col gap-5">
           <div className="flex flex-wrap items-center justify-between gap-x-6 gap-y-3">
             <h2 className="font-display text-[28px] leading-[34px] font-bold tracking-tight">Przeglądaj gry</h2>
-            <SegmentedControl label="Sekcje" items={BROWSE_TABS} value={tab} onChange={setTab} />
+            <SegmentedControl label="Sekcje" items={TAB_LABELS} value={filters.tab} onChange={(tab: TabLabel) => setFilters({ ...filters, tab })} />
           </div>
-          <Status pending={browse.isPending} error={browse.error} empty={browse.data?.length === 0} />
-          <div className="grid grid-cols-[repeat(auto-fill,minmax(270px,1fr))] gap-6">{browse.data?.map((game) => card(game))}</div>
+
+          <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
+            <Button variant="outline" size="sm" aria-expanded={filtersOpen} onClick={() => setFiltersOpen(!filtersOpen)}>
+              <SlidersHorizontal aria-hidden className="size-4" />
+              Filtry{activeCount > 0 && ` (${activeCount})`}
+            </Button>
+            <span aria-live="polite" className="text-[13px] leading-[18px] text-muted-foreground">
+              {browse.data ? gamesCount(total) : <Skeleton className="inline-block h-4 w-20 align-middle" />}
+            </span>
+            {activeCount > 0 && (
+              <Button variant="ghost" size="sm" className="ml-auto" onClick={() => setFilters({ ...DEFAULT_FILTERS, tab: filters.tab })}>
+                Wyczyść filtry
+              </Button>
+            )}
+          </div>
+          {filtersOpen && <FilterPanel filters={filters} onChange={setFilters} />}
+
+          {browse.error && <p role="alert" className="text-sm font-medium text-destructive">Nie udało się wczytać gier: {browse.error.message}</p>}
+          {browse.data && browseGames.length === 0 && <p className="text-sm text-muted-foreground">Żadna gra nie pasuje do wybranych filtrów.</p>}
+          <div aria-busy={browse.isFetching} className={`grid grid-cols-[repeat(auto-fill,minmax(270px,1fr))] gap-6 transition-opacity ${browse.isPlaceholderData ? "opacity-60" : ""}`}>
+            {browse.isPending ? skeletons(8) : browseGames.map((game) => card(game))}
+            {browse.isFetchingNextPage && skeletons(4)}
+          </div>
+          {browse.hasNextPage && (
+            <Button variant="secondary" className="self-center" disabled={browse.isFetchingNextPage} onClick={() => browse.fetchNextPage()}>
+              Pokaż więcej
+            </Button>
+          )}
         </section>
       </div>
     </div>
