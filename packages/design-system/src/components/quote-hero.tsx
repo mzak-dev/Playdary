@@ -1,6 +1,7 @@
 import { animate, stagger } from "animejs";
 import { Fragment, useEffect, useRef, useState, type ReactNode } from "react";
 import { Button } from "./button";
+import DotGrid from "./dot-grid";
 
 export type Quote = { text: string; game: string; year: number };
 
@@ -47,6 +48,9 @@ export function QuoteHero({ user, quotes, interval = 9000, onOpenGame, children 
       onBlur={() => setPaused(false)}
       className="relative -mt-[68px] overflow-hidden px-4 pt-[108px] pb-[120px] sm:px-8"
     >
+      <div aria-hidden className="pointer-events-none absolute inset-0 [mask-image:linear-gradient(to_bottom,#000_55%,rgba(0,0,0,0.25))]">
+        <DotGrid dotSize={3} gap={25} baseColor="#a1a1aa" activeColor="#1fa9ec" opacity={0.35} proximity={150} />
+      </div>
       <div aria-hidden className="pointer-events-none absolute inset-0">
         <i className="absolute top-[-80px] left-[6%] size-[340px] rounded-full bg-primary opacity-[0.28] blur-[80px]" />
         <i className="absolute top-[30px] right-[4%] size-[300px] rounded-full bg-cover-rose opacity-[0.28] blur-[80px]" />
