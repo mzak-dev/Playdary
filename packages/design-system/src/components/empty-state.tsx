@@ -7,7 +7,7 @@ type EmptyStateProps = { label: string; title: string; text: string; covers: str
 
 export function EmptyState({ label, title, text, covers, action }: EmptyStateProps) {
   return (
-    <div className="relative isolate min-h-[480px] overflow-hidden rounded-xl border border-white/5 bg-white/[0.02]">
+    <div className="relative isolate min-h-[480px] overflow-hidden">
       <div aria-hidden className="absolute inset-0">
         <GridMotion items={covers.map((cover) => igdbImage(cover))} aspectRatio={0.75} gap={14} angle={-12} speed={22} />
       </div>
