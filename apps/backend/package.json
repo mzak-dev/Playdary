@@ -1,0 +1,14 @@
+{
+  "name": "@playdary/backend",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "supabase start",
+    "stop": "supabase stop",
+    "db:reset": "supabase db reset",
+    "db:new": "supabase migration new"
+  },
+  "devDependencies": {
+    "supabase": "^2.121.0"
+  }
+}
