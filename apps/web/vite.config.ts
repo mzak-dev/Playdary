@@ -5,5 +5,6 @@ import { defineConfig } from "vite";
 
 export default defineConfig({
   base: process.env.VITE_BASE ?? "/",
+  worker: { format: "es" },
   plugins: [tanstackRouter({ target: "react", autoCodeSplitting: true }), react(), tailwindcss()],
 });

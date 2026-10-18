@@ -45,6 +45,9 @@ importers:
 
   apps/web:
     dependencies:
+      '@huggingface/transformers':
+        specifier: ^4.3.1
+        version: 4.3.1(@types/node@26.6.5)
       '@playdary/design-system':
         specifier: workspace:^
         version: link:../../packages/design-system

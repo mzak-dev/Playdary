@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import { cn } from "../lib/cn";
 import type { Game } from "../types";
 import { GameCover } from "./game-cover";
+import { Skeleton } from "./skeleton";
 
 type NavLink = { id: string; label: string; short: string };
 
@@ -14,6 +15,7 @@ type NavBarProps = {
   suggestions: Game[];
   onSearch: (query: string) => void;
   onPick: (id: number) => void;
+  searching: boolean;
   onSignOut: () => void;
 };
 
@@ -32,7 +34,7 @@ function useHiddenOnScrollDown() {
   return hidden;
 }
 
-export function NavBar({ user, links, active, onNavigate, suggestions, onSearch, onPick, onSignOut }: NavBarProps) {
+export function NavBar({ user, links, active, onNavigate, suggestions, searching, onSearch, onPick, onSignOut }: NavBarProps) {
   const [menuOpen, setMenuOpen] = useState(false);
   const menu = useRef<HTMLDivElement>(null);
   const [searchOpen, setSearchOpen] = useState(false);
@@ -120,7 +122,17 @@ export function NavBar({ user, links, active, onNavigate, suggestions, onSearch,
           </div>
           {searchOpen && query.trim() && (
             <div aria-label="Podpowiedzi" className="absolute top-[calc(100%+16px)] left-0 w-[360px] max-w-[calc(100vw-48px)] rounded-md bg-popover p-1.5 text-popover-foreground shadow-pop ring-1 ring-border">
-              {suggestions.length === 0 && <p className="p-3 text-[13px] leading-[18px] text-muted-foreground">Brak gier pasujących do wyszukiwania.</p>}
+              {searching && suggestions.length === 0 &&
+                [0, 1, 2].map((i) => (
+                  <div key={i} aria-hidden className="flex items-center gap-3 px-3 py-2">
+                    <Skeleton className="h-[60px] w-[88px] shrink-0" />
+                    <div className="flex flex-1 flex-col gap-2">
+                      <Skeleton className="h-4 w-3/4" />
+                      <Skeleton className="h-3.5 w-1/2" />
+                    </div>
+                  </div>
+                ))}
+              {!searching && suggestions.length === 0 && <p className="p-3 text-[13px] leading-[18px] text-muted-foreground">Brak gier pasujących do wyszukiwania.</p>}
               {suggestions.map((game) => (
                 <button
                   key={game.id}

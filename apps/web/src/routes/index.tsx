@@ -42,7 +42,8 @@ function Home() {
   const top = useTopUpcoming();
   const ticker = useTicker();
   const browse = useBrowse(filters);
-  const search = useSearch(useDebounced(query.trim()));
+  const debouncedQuery = useDebounced(query.trim());
+  const search = useSearch(debouncedQuery);
   const follows = useFollows(userId);
   const toggleFollow = useToggleFollow(userId);
 
@@ -77,6 +78,7 @@ function Home() {
         active="home"
         onNavigate={() => {}}
         suggestions={query.trim().length > 1 ? (search.data ?? []) : []}
+        searching={search.isFetching || query.trim() !== debouncedQuery}
         onSearch={setQuery}
         onPick={() => {}}
         onSignOut={signOut}

@@ -1,5 +1,6 @@
 import type { Friend, Game } from "@playdary/design-system";
 import { keepPreviousData, useInfiniteQuery, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { embedText } from "./embed";
 import { toRpcParams, type Filters } from "./filters";
 import { polishTags } from "./labels";
 import { supabase } from "./supabase";
@@ -75,13 +76,24 @@ export const useBrowse = (filters: Filters) =>
 
 type SearchRow = { id: number; name: string; data: { cover: string | null; genres: string[]; themes: string[]; platforms: string[] } };
 
-export const useSearch = (query: string) =>
+const useQueryEmbedding = (query: string) =>
   useQuery({
-    queryKey: ["games", "search", query],
+    queryKey: ["embedding", query],
+    enabled: query.length > 1,
+    staleTime: Infinity,
+    retry: false,
+    queryFn: () => embedText(query),
+  });
+
+export const useSearch = (query: string) => {
+  const embedding = useQueryEmbedding(query).data ?? null;
+
+  return useQuery({
+    queryKey: ["games", "search", query, embedding !== null],
     enabled: query.length > 1,
     placeholderData: keepPreviousData,
     queryFn: async (): Promise<Game[]> => {
-      const { data, error } = await supabase.rpc("search_games", { q: query, lim: 5 });
+      const { data, error } = await supabase.rpc("search_games", { q: query, q_embedding: embedding, lim: 6 });
       if (error) throw new Error(error.message);
       return (data as SearchRow[]).map((row) => ({
         id: row.id,
@@ -95,6 +107,7 @@ export const useSearch = (query: string) =>
       }));
     },
   });
+};
 
 type FriendRow = { game_id: number; username: string; kind: Friend["kind"]; score: number | null };
 
