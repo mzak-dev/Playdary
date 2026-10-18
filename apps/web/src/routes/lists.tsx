@@ -73,7 +73,7 @@ function Lists() {
         </div>
       </PageHero>
 
-      <div className="relative z-[3] -mt-[72px] min-h-[55vh] rounded-t-xl border border-b-0 border-white/5 bg-card/70 px-4 pt-10 pb-18 shadow-[inset_0_1px_0_rgba(255,255,255,0.06),0_-24px_60px_rgba(0,0,0,0.35)] backdrop-blur-xl sm:px-8">
+      <div className="relative z-[3] -mt-[72px] min-h-[55vh] rounded-t-xl border border-b-0 border-white/5 bg-card/90 px-4 sm:bg-card/70 pt-10 pb-18 shadow-[inset_0_1px_0_rgba(255,255,255,0.06),0_-24px_60px_rgba(0,0,0,0.35)] sm:backdrop-blur-xl sm:px-8">
         {listed.error && <p role="alert" className="text-sm font-medium text-destructive">Nie udało się wczytać list: {listed.error.message}</p>}
 
         {pending && (

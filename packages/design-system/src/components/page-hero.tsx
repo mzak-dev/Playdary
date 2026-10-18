@@ -12,8 +12,8 @@ export function PageHero({ children, className, contentClassName, ...props }: Pa
           <DotGrid dotSize={3} gap={25} baseColor="#a1a1aa" activeColor="#1fa9ec" opacity={0.35} proximity={150} />
         </div>
         <div className="relative mx-auto h-full max-w-[1344px]">
-          <i className="absolute top-[-80px] left-[6%] size-[340px] rounded-full bg-primary opacity-[0.28] blur-[80px]" />
-          <i className="absolute top-[30px] right-[4%] size-[300px] rounded-full bg-cover-rose opacity-[0.28] blur-[80px]" />
+          <i className="absolute top-[-80px] left-[6%] size-[340px] rounded-full bg-primary opacity-[0.28] blur-[40px] sm:blur-[80px]" />
+          <i className="absolute top-[30px] right-[4%] size-[300px] rounded-full bg-cover-rose opacity-[0.28] blur-[40px] sm:blur-[80px]" />
         </div>
       </div>
       <div className={cn("relative z-[2] flex flex-col gap-5", contentClassName)}>{children}</div>

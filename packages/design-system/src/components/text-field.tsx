@@ -15,7 +15,7 @@ export function TextField({ label, className, id, ...props }: TextFieldProps) {
       <input
         id={fieldId}
         className={cn(
-          "h-12 rounded-md bg-background px-4 text-[15px] shadow-[inset_0_0_0_1.5px_var(--input)] outline-none placeholder:text-muted-foreground focus:shadow-[inset_0_0_0_1.5px_var(--primary)]",
+          "h-12 rounded-md bg-background px-4 text-base sm:text-[15px] shadow-[inset_0_0_0_1.5px_var(--input)] outline-none placeholder:text-muted-foreground focus:shadow-[inset_0_0_0_1.5px_var(--primary)]",
           className,
         )}
         {...props}

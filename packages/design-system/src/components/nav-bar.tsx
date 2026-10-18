@@ -105,7 +105,12 @@ export function NavBar({ user, links, active, onNavigate, suggestions, searching
                 <input
                   ref={input}
                   value={query}
+                  type="search"
                   autoComplete="off"
+                  autoCorrect="off"
+                  autoCapitalize="off"
+                  spellCheck={false}
+                  enterKeyHint="search"
                   placeholder="Szukaj gier…"
                   aria-label="Szukaj gier"
                   onChange={(e) => {
@@ -113,7 +118,7 @@ export function NavBar({ user, links, active, onNavigate, suggestions, searching
                     onSearch(e.target.value);
                   }}
                   onKeyDown={(e) => e.key === "Escape" && closeSearch()}
-                  className="h-10 min-w-0 flex-1 bg-transparent px-1 text-sm font-medium outline-none placeholder:text-muted-foreground"
+                  className="h-10 min-w-0 flex-1 appearance-none bg-transparent px-1 text-base font-medium outline-none sm:text-sm [&::-webkit-search-cancel-button]:hidden placeholder:text-muted-foreground"
                 />
                 <button type="button" aria-label="Zamknij wyszukiwarkę" onClick={closeSearch} className="grid size-10 shrink-0 place-items-center rounded-full hover:bg-accent">
                   <X aria-hidden className="size-[18px]" />
