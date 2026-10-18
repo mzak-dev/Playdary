@@ -23,6 +23,14 @@
 - Enable Pages with source "GitHub Actions" in repository settings.
 - Add `https://<user>.github.io/<repo>/` to Supabase Auth redirect URLs.
 
+## Auth
+
+- E-mail and password through Supabase Auth; the username is sent as signup metadata and the `handle_new_user` trigger copies it into `profiles`.
+- Routes: `/login` redirects signed-in users to `/`; `/` requires a session via `beforeLoad`.
+- Supabase dashboard, Authentication, URL Configuration: Site URL `https://mzak-dev.github.io/Playdary/`, redirect URLs also `http://localhost:5173/**`.
+- "Confirm email" is on by default: a new account must click the mailed link before signing in. The built-in mailer is rate-limited (a few mails per hour); switch to custom SMTP or disable confirmation for development.
+- Local variables live in `apps/web/.env.local` (gitignored).
+
 ## Pages specifics
 
 - Router `basepath` and Vite `base` come from `VITE_BASE`.

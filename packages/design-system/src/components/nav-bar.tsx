@@ -14,6 +14,7 @@ type NavBarProps = {
   suggestions: Game[];
   onSearch: (query: string) => void;
   onPick: (id: number) => void;
+  onSignOut: () => void;
 };
 
 function useHiddenOnScrollDown() {
@@ -31,7 +32,9 @@ function useHiddenOnScrollDown() {
   return hidden;
 }
 
-export function NavBar({ user, links, active, onNavigate, suggestions, onSearch, onPick }: NavBarProps) {
+export function NavBar({ user, links, active, onNavigate, suggestions, onSearch, onPick, onSignOut }: NavBarProps) {
+  const [menuOpen, setMenuOpen] = useState(false);
+  const menu = useRef<HTMLDivElement>(null);
   const [searchOpen, setSearchOpen] = useState(false);
   const [query, setQuery] = useState("");
   const input = useRef<HTMLInputElement>(null);
@@ -41,6 +44,19 @@ export function NavBar({ user, links, active, onNavigate, suggestions, onSearch,
   useEffect(() => {
     if (searchOpen) input.current?.focus();
   }, [searchOpen]);
+
+  useEffect(() => {
+    if (!menuOpen) return;
+    const close = (e: MouseEvent | KeyboardEvent) => {
+      if (e instanceof KeyboardEvent ? e.key === "Escape" : !menu.current?.contains(e.target as Node)) setMenuOpen(false);
+    };
+    document.addEventListener("mousedown", close);
+    document.addEventListener("keydown", close);
+    return () => {
+      document.removeEventListener("mousedown", close);
+      document.removeEventListener("keydown", close);
+    };
+  }, [menuOpen]);
 
   const closeSearch = () => {
     setSearchOpen(false);
@@ -130,9 +146,26 @@ export function NavBar({ user, links, active, onNavigate, suggestions, onSearch,
           <Bell aria-hidden className="size-5" />
           <span className="absolute top-[7px] right-[7px] size-2.5 rounded-full bg-primary ring-2 ring-secondary" />
         </button>
-        <button type="button" aria-label={`Profil: ${user}`} className="grid size-10 place-items-center rounded-full bg-accent text-sm font-bold text-accent-foreground uppercase">
-          {user.charAt(0)}
-        </button>
+        <div ref={menu} className="relative">
+          <button
+            type="button"
+            aria-label={`Profil: ${user}`}
+            aria-haspopup="menu"
+            aria-expanded={menuOpen}
+            onClick={() => setMenuOpen(!menuOpen)}
+            className="grid size-10 place-items-center rounded-full bg-accent text-sm font-bold text-accent-foreground uppercase"
+          >
+            {user.charAt(0)}
+          </button>
+          {menuOpen && (
+            <div role="menu" className="absolute top-[calc(100%+16px)] right-0 min-w-48 rounded-md bg-popover p-1.5 text-popover-foreground shadow-pop ring-1 ring-border">
+              <p className="px-3 pt-2 pb-1 text-[13px] leading-[18px] text-muted-foreground">Zalogowano jako {user}</p>
+              <button type="button" role="menuitem" onClick={onSignOut} className="w-full rounded-[10px] px-3 py-2.5 text-left text-sm font-medium hover:bg-accent focus-visible:bg-accent">
+                Wyloguj się
+              </button>
+            </div>
+          )}
+        </div>
       </nav>
     </div>
   );

@@ -11,4 +11,5 @@ export { SegmentedControl } from "./components/segmented-control";
 export { Rail } from "./components/rail";
 export { ReleaseTicker } from "./components/release-ticker";
 export { QuoteHero, type Quote } from "./components/quote-hero";
+export { TextField } from "./components/text-field";
 export { NavBar } from "./components/nav-bar";

@@ -1,9 +1,15 @@
 import { GameCard, NavBar, QuoteHero, Rail, ReleaseTicker, SegmentedControl, type Game } from "@playdary/design-system";
-import { createFileRoute } from "@tanstack/react-router";
+import { useQuery } from "@tanstack/react-query";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
+import { requireSession } from "../lib/auth";
+import { supabase } from "../lib/supabase";
 import { sampleFriends, sampleGames, sampleQuotes } from "../sample-data";
 
-export const Route = createFileRoute("/")({ component: Home });
+export const Route = createFileRoute("/")({
+  beforeLoad: async () => ({ session: await requireSession() }),
+  component: Home,
+});
 
 const NAV_LINKS = [
   { id: "home", label: "Strona główna", short: "Główna" },
@@ -21,6 +27,19 @@ const byTab: Record<Tab, (games: Game[]) => Game[]> = {
 };
 
 function Home() {
+  const { session } = Route.useRouteContext();
+  const navigate = useNavigate();
+  const { data: profile } = useQuery({
+    queryKey: ["profile", session.user.id],
+    queryFn: async () => (await supabase.from("profiles").select("username").eq("id", session.user.id).single()).data,
+  });
+  const user = profile?.username ?? session.user.email?.split("@")[0] ?? "";
+
+  const signOut = async () => {
+    await supabase.auth.signOut();
+    await navigate({ to: "/login" });
+  };
+
   const [tab, setTab] = useState<Tab>("Popularne");
   const [query, setQuery] = useState("");
   const [followed, setFollowed] = useState<Set<number>>(new Set());
@@ -43,9 +62,9 @@ function Home() {
 
   return (
     <div className="mx-auto max-w-[1344px]">
-      <NavBar user="admin" links={NAV_LINKS} active="home" onNavigate={() => {}} suggestions={suggestions} onSearch={setQuery} onPick={() => {}} />
+      <NavBar user={user} links={NAV_LINKS} active="home" onNavigate={() => {}} suggestions={suggestions} onSearch={setQuery} onPick={() => {}} onSignOut={signOut} />
 
-      <QuoteHero user="admin" quotes={sampleQuotes}>
+      <QuoteHero user={user} quotes={sampleQuotes}>
         <ReleaseTicker games={upcoming} />
       </QuoteHero>
 
