@@ -21,7 +21,10 @@ export function Gallery({ slides }: { slides: Slide[] }) {
   };
   const onScroll = () => {
     const el = track.current;
-    if (el) setIndex(Math.round(el.scrollLeft / el.clientWidth));
+    if (!el) return;
+    const next = Math.round(el.scrollLeft / el.clientWidth);
+    setIndex(next);
+    if (playing !== null && next !== playing) setPlaying(null);
   };
 
   return (
