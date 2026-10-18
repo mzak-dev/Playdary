@@ -2,7 +2,7 @@ import { GameCover, Skeleton, StatTile, Tag } from "@playdary/design-system";
 import { ArrowUpRight } from "lucide-react";
 import type { ReactNode } from "react";
 import { useExistingGameIds, useRequirements, type Details } from "../lib/games";
-import { REGIONS, RELEASE_STATUSES } from "../lib/labels";
+import { AGE_ORGANIZATIONS, AGE_RATINGS, REGIONS, RELEASE_STATUSES, ageDescriptor } from "../lib/labels";
 
 export const SectionTitle = ({ children, large }: { children: ReactNode; large?: boolean }) => (
   <h2 className={large ? "font-display text-[28px] leading-[34px] font-bold tracking-tight" : "font-display text-xl leading-[26px] font-bold"}>{children}</h2>
@@ -43,9 +43,11 @@ export function AgeRatings({ items }: { items: Details["ageRatings"] }) {
         <div className="flex flex-wrap gap-2">
           {items.map((item, i) => (
             <div key={i} className="flex min-w-[110px] flex-1 flex-col gap-0.5 rounded-md bg-secondary p-4">
-              <span className="text-xs leading-4 font-semibold text-muted-foreground">{item.organization}</span>
-              <span className="font-display text-xl leading-[26px] font-bold">{item.rating}</span>
-              {item.descriptors.length > 0 && <span className="text-xs leading-4 text-muted-foreground">{item.descriptors.join(", ")}</span>}
+              <span className="text-xs leading-4 font-semibold text-muted-foreground">{AGE_ORGANIZATIONS[item.organization ?? ""] ?? item.organization}</span>
+              <span className="font-display text-xl leading-[26px] font-bold">{AGE_RATINGS[item.rating ?? ""] ?? item.rating}</span>
+              {item.descriptors.length > 0 && (
+                <span className="text-xs leading-4 text-muted-foreground">{[...new Set(item.descriptors.map(ageDescriptor))].join(", ")}</span>
+              )}
             </div>
           ))}
         </div>

@@ -89,4 +89,86 @@ export const RELEASE_STATUSES: Record<string, string> = {
 
 export const tr = (value: string) => PL[value] ?? value;
 
+const AGE_DESCRIPTORS: Record<string, string> = {
+  Violence: "Przemoc",
+  "Intense Violence": "Intensywna przemoc",
+  "Extreme Violence": "Ekstremalna przemoc",
+  "Mild Violence": "Łagodna przemoc",
+  "Fantasy Violence": "Przemoc fantasy",
+  "Mild Fantasy Violence": "Łagodna przemoc fantasy",
+  "Animated Violence": "Przemoc rysunkowa",
+  "Mild Animated Violence": "Łagodna przemoc rysunkowa",
+  "Cartoon Violence": "Przemoc rysunkowa",
+  "Mild Cartoon Violence": "Łagodna przemoc rysunkowa",
+  "Realistic Violence": "Realistyczna przemoc",
+  "Violent References": "Odniesienia do przemocy",
+  Blood: "Krew",
+  "Mild Blood": "Odrobina krwi",
+  "Animated Blood": "Rysunkowa krew",
+  "Blood and Gore": "Krew i okrucieństwo",
+  "Animated Blood and Gore": "Rysunkowa krew i okrucieństwo",
+  Language: "Język",
+  "Mild Language": "Łagodny język",
+  "Strong Language": "Wulgarny język",
+  "Bad Language": "Wulgarny język",
+  "Inappropriate Language": "Nieodpowiedni język",
+  "Languages and others": "Język i inne",
+  Lyrics: "Teksty piosenek",
+  "Mild Lyrics": "Łagodne teksty piosenek",
+  "Crude Humor": "Wulgarny humor",
+  "Mature Humor": "Dojrzały humor",
+  "Comic Mischief": "Komediowe psoty",
+  Sex: "Seks",
+  Sexuality: "Seksualność",
+  "Sexual Content": "Treści seksualne",
+  "Strong Sexual Content": "Mocne treści seksualne",
+  "Sexual Themes": "Motywy seksualne",
+  "Mild Sexual Themes": "Łagodne motywy seksualne",
+  "Mature Sexual Themes": "Dojrzałe motywy seksualne",
+  "Suggestive Themes": "Sugestywne motywy",
+  "Mild Suggestive Themes": "Łagodne sugestywne motywy",
+  Nudity: "Nagość",
+  "Partial Nudity": "Częściowa nagość",
+  Love: "Miłość",
+  Drugs: "Narkotyki",
+  "Illegal Drugs": "Nielegalne narkotyki",
+  "Legal Drugs": "Legalne używki",
+  "Use of Drugs": "Narkotyki",
+  "Drug Reference": "Wzmianki o narkotykach",
+  "Controlled substances": "Substancje kontrolowane",
+  "Use of Alcohol": "Alkohol",
+  "Alcohol Reference": "Wzmianki o alkoholu",
+  "Use of Tobacco": "Tytoń",
+  "Tobacco Reference": "Wzmianki o tytoniu",
+  "Use of Alcohol and Tobacco": "Alkohol i tytoń",
+  "Alcohol and Tobacco Reference": "Wzmianki o alkoholu i tytoniu",
+  "Use of Drugs and Alcohol": "Narkotyki i alkohol",
+  "Alcohol, Tobacco, Drug": "Alkohol, tytoń, narkotyki",
+  Fear: "Strach",
+  Horror: "Horror",
+  "Fear, Horror, Threatening": "Strach, horror, groźby",
+  Crime: "Przestępczość",
+  "Crime, Anti-Social": "Przestępczość, zachowania aspołeczne",
+  Gambling: "Hazard",
+  "Simulated Gambling": "Symulowany hazard",
+  "In-Game Purchases": "Zakupy w grze",
+  "Users Interact": "Interakcje użytkowników",
+  "Online Gameplay": "Gra online",
+};
+
+export const ageDescriptor = (raw: string) => {
+  const english = raw.match(/\(([^)]+)\)\s*$/)?.[1] ?? raw;
+  return AGE_DESCRIPTORS[english] ?? english;
+};
+
+export const AGE_ORGANIZATIONS: Record<string, string> = { CLASS_IND: "ClassInd" };
+
+export const AGE_RATINGS: Record<string, string> = {
+  ALL: "Wszyscy",
+  L: "Wszyscy",
+  RC: "Odmowa klasyfikacji",
+  RP: "Oczekuje na ocenę",
+  TESTING: "W testach",
+};
+
 export const polishTags = (...groups: (string[] | null)[]) => [...new Set(groups.flatMap((group) => group ?? []).map((tag) => PL[tag] ?? tag))];
