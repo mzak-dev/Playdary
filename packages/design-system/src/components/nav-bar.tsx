@@ -1,5 +1,6 @@
 import { Bell, Search, X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
+import logo from "../assets/logo.png";
 import { cn } from "../lib/cn";
 import type { Game } from "../types";
 import { GameCover } from "./game-cover";
@@ -70,8 +71,8 @@ export function NavBar({ user, links, active, onNavigate, suggestions, searching
     <div className={cn("pointer-events-none sticky top-0 z-50 flex justify-center px-4 pt-3 transition duration-500 sm:px-8", hidden && "-translate-y-[90px] opacity-0")}>
       <nav aria-label="Główna" className="pointer-events-auto relative flex max-w-full items-center gap-2 rounded-full bg-secondary py-2 pr-2 pl-[18px] shadow-pop">
         <div className="mr-4 flex items-center gap-2.5 font-display text-[15px] leading-none font-extrabold tracking-[0.06em] uppercase">
-          <span aria-hidden className="grid size-7 place-items-center rounded-full bg-foreground text-[13px] tracking-normal text-background">P</span>
-          <span className="hidden sm:inline">Playdary</span>
+          <img src={logo} alt="Playdary" width={28} height={28} className="size-7" />
+          <span aria-hidden className="hidden sm:inline">Playdary</span>
         </div>
 
         <div className={cn("relative grid overflow-hidden rounded-full transition-[width,opacity] duration-[400ms]", searchOpen ? "invisible w-0 opacity-0" : "w-[150px] sm:w-60")} style={{ gridTemplateColumns: `repeat(${links.length}, 1fr)` }}>
