@@ -3,17 +3,16 @@ import { useEffect, useRef, useState } from "react";
 import type { GameList } from "../types";
 import { Button } from "./button";
 
-const LISTS: { id: GameList; label: string }[] = [
+export const LISTS: { id: GameList; label: string }[] = [
   { id: "playing", label: "Gram" },
   { id: "wishlist", label: "Chcę zagrać" },
   { id: "done", label: "Ukończone" },
   { id: "dropped", label: "Porzucone" },
 ];
 
-type ListButtonProps = { value?: GameList | null; onChange?: (value: GameList | null) => void };
+type ListButtonProps = { value: GameList | null; onChange?: (value: GameList | null) => void; size?: "sm" | "md" };
 
-export function ListButton({ value = null, onChange }: ListButtonProps) {
-  const [selected, setSelected] = useState(value);
+export function ListButton({ value, onChange, size = "sm" }: ListButtonProps) {
   const [open, setOpen] = useState(false);
   const root = useRef<HTMLDivElement>(null);
 
@@ -30,17 +29,15 @@ export function ListButton({ value = null, onChange }: ListButtonProps) {
     };
   }, [open]);
 
-  const current = LISTS.find((list) => list.id === selected);
+  const current = LISTS.find((list) => list.id === value);
   const pick = (id: GameList) => {
-    const next = id === selected ? null : id;
-    setSelected(next);
     setOpen(false);
-    onChange?.(next);
+    onChange?.(id === value ? null : id);
   };
 
   return (
     <div ref={root} className="relative inline-block">
-      <Button size="sm" variant={current ? "outline" : "secondary"} aria-haspopup="menu" aria-expanded={open} onClick={() => setOpen(!open)}>
+      <Button size={size} variant={current ? "outline" : "secondary"} aria-haspopup="menu" aria-expanded={open} onClick={() => setOpen(!open)}>
         {current ? <Check aria-hidden className="size-4" /> : <Plus aria-hidden className="size-4" />}
         {current ? current.label : "Dodaj do listy"}
       </Button>
@@ -51,12 +48,12 @@ export function ListButton({ value = null, onChange }: ListButtonProps) {
               key={list.id}
               type="button"
               role="menuitemradio"
-              aria-checked={list.id === selected}
+              aria-checked={list.id === value}
               onClick={() => pick(list.id)}
               className="flex w-full items-center justify-between gap-3 rounded-[10px] px-3 py-2.5 text-left text-sm font-medium hover:bg-accent focus-visible:bg-accent"
             >
               {list.label}
-              {list.id === selected && <Check aria-hidden className="size-4" />}
+              {list.id === value && <Check aria-hidden className="size-4" />}
             </button>
           ))}
         </div>

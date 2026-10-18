@@ -76,6 +76,63 @@ export const useBrowse = (filters: Filters) =>
 
 type SearchRow = { id: number; name: string; data: { cover: string | null; genres: string[]; themes: string[]; platforms: string[] } };
 
+export type GameDetail = {
+  game: Game;
+  summary: string | null;
+  storyline: string | null;
+  screenshots: string[];
+  videos: string[];
+  ratingCount: number | null;
+};
+
+type DetailRow = Omit<GameRow, "cover" | "genres" | "themes" | "platforms"> & {
+  rating_count: number | null;
+  data: {
+    cover: string | null;
+    genres: string[];
+    themes: string[];
+    platforms: string[];
+    summary: string | null;
+    storyline: string | null;
+    screenshots: string[];
+    videos: string[];
+  };
+};
+
+export const useGame = (gameId: number) =>
+  useQuery({
+    queryKey: ["games", "detail", gameId],
+    staleTime: STALE_TIME,
+    queryFn: async (): Promise<GameDetail | null> => {
+      const { data, error } = await supabase
+        .from("games")
+        .select("id, name, hypes, score, release_date, rating_count, data")
+        .eq("id", gameId)
+        .maybeSingle();
+      if (error) throw new Error(error.message);
+      if (!data) return null;
+      const row = data as unknown as DetailRow;
+      return {
+        game: toGame({ ...row, ...row.data }),
+        summary: row.data.summary,
+        storyline: row.data.storyline,
+        screenshots: row.data.screenshots,
+        videos: row.data.videos,
+        ratingCount: row.rating_count,
+      };
+    },
+  });
+
+export const useSimilar = (gameId: number) =>
+  useQuery({
+    queryKey: ["games", "similar", gameId],
+    staleTime: STALE_TIME,
+    queryFn: async () => {
+      const { data, error } = await supabase.rpc("similar_games", { p_game_id: gameId, p_limit: 6 });
+      return toGames({ data, error });
+    },
+  });
+
 const useQueryEmbedding = (query: string) =>
   useQuery({
     queryKey: ["embedding", query],

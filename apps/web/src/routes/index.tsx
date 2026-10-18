@@ -1,25 +1,20 @@
-import { Button, GameCard, GameCardSkeleton, NavBar, QuoteHero, Rail, ReleaseTicker, SegmentedControl, Skeleton, type Game } from "@playdary/design-system";
-import { useQuery } from "@tanstack/react-query";
+import { Button, GameCard, GameCardSkeleton, QuoteHero, Rail, ReleaseTicker, SegmentedControl, Skeleton, type Game } from "@playdary/design-system";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { SlidersHorizontal } from "lucide-react";
 import { useMemo, useState } from "react";
+import { AppShell } from "../components/app-shell";
 import { FilterPanel } from "../components/filter-panel";
 import { requireSession } from "../lib/auth";
 import { DEFAULT_FILTERS, TABS, activeFilterCount, type Filters, type TabLabel } from "../lib/filters";
-import { useBrowse, useFollows, useFriends, useSearch, useTicker, useToggleFollow, useTopUpcoming } from "../lib/games";
-import { supabase } from "../lib/supabase";
-import { useDebounced } from "../lib/use-debounced";
+import { useBrowse, useFollows, useFriends, useTicker, useToggleFollow, useTopUpcoming } from "../lib/games";
+import { useSetList, useUserLists } from "../lib/library";
+import { useUsername } from "../lib/profile";
 import { quotes } from "../quotes";
 
 export const Route = createFileRoute("/")({
   beforeLoad: async () => ({ session: await requireSession() }),
   component: Home,
 });
-
-const NAV_LINKS = [
-  { id: "home", label: "Strona główna", short: "Główna" },
-  { id: "lists", label: "Moje listy", short: "Listy" },
-];
 
 const TAB_LABELS = TABS.map((tab) => tab.label);
 const skeletons = (count: number, className?: string) => Array.from({ length: count }, (_, i) => <GameCardSkeleton key={i} className={className} />);
@@ -30,22 +25,17 @@ function Home() {
   const { session } = Route.useRouteContext();
   const navigate = useNavigate();
   const userId = session.user.id;
-  const { data: profile } = useQuery({
-    queryKey: ["profile", userId],
-    queryFn: async () => (await supabase.from("profiles").select("username").eq("id", userId).single()).data,
-  });
-  const user = profile?.username ?? session.user.email?.split("@")[0] ?? "";
+  const user = useUsername(session);
 
   const [filters, setFilters] = useState<Filters>(DEFAULT_FILTERS);
   const [filtersOpen, setFiltersOpen] = useState(false);
-  const [query, setQuery] = useState("");
   const top = useTopUpcoming();
   const ticker = useTicker();
   const browse = useBrowse(filters);
-  const debouncedQuery = useDebounced(query.trim());
-  const search = useSearch(debouncedQuery);
   const follows = useFollows(userId);
   const toggleFollow = useToggleFollow(userId);
+  const lists = useUserLists(userId);
+  const setList = useSetList(userId);
 
   const browseGames = useMemo(() => browse.data?.pages.flatMap((page) => page.games) ?? [], [browse.data]);
   const total = browse.data?.pages[0]?.total ?? 0;
@@ -53,10 +43,7 @@ function Home() {
   const visibleIds = useMemo(() => [...new Set([...(top.data ?? []), ...browseGames].map((g) => g.id))].sort((a, b) => a - b), [top.data, browseGames]);
   const friends = useFriends(visibleIds).data;
 
-  const signOut = async () => {
-    await supabase.auth.signOut();
-    await navigate({ to: "/login" });
-  };
+  const open = (id: number) => navigate({ to: "/games/$gameId", params: { gameId: String(id) } });
 
   const card = (game: Game, rank?: number, className?: string) => (
     <GameCard
@@ -65,28 +52,19 @@ function Home() {
       rank={rank}
       friend={friends?.[game.id]}
       following={follows.data?.has(game.id) ?? false}
+      list={lists.data?.[game.id] ?? null}
       onFollow={(follow) => toggleFollow.mutate({ gameId: game.id, follow })}
+      onListChange={(list) => setList.mutate({ gameId: game.id, list })}
+      onOpen={() => open(game.id)}
       className={className}
     />
   );
 
   return (
-    <div className="mx-auto max-w-[1344px]">
-      <NavBar
-        user={user}
-        links={NAV_LINKS}
-        active="home"
-        onNavigate={() => {}}
-        suggestions={query.trim().length > 1 ? (search.data ?? []) : []}
-        searching={search.isFetching || query.trim() !== debouncedQuery}
-        onSearch={setQuery}
-        onPick={() => {}}
-        onSignOut={signOut}
-      />
-
+    <AppShell session={session}>
       <QuoteHero user={user} quotes={quotes}>
         {ticker.data ? (
-          ticker.data.length > 0 && <ReleaseTicker games={ticker.data} />
+          ticker.data.length > 0 && <ReleaseTicker games={ticker.data} onOpen={open} />
         ) : (
           <div aria-hidden className="flex gap-1.5 overflow-hidden px-4 py-1.5 sm:px-8">
             {Array.from({ length: 5 }, (_, i) => (
@@ -137,6 +115,6 @@ function Home() {
           )}
         </section>
       </div>
-    </div>
+    </AppShell>
   );
 }

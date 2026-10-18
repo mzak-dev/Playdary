@@ -16,6 +16,7 @@ type GameCardProps = {
   list?: GameList | null;
   following?: boolean;
   onFollow?: (following: boolean) => void;
+  onListChange?: (list: GameList | null) => void;
   onOpen?: () => void;
   className?: string;
 };
@@ -26,7 +27,7 @@ const trackPointer = (e: MouseEvent<HTMLElement>) => {
   e.currentTarget.style.setProperty("--my", `${e.clientY - rect.top}px`);
 };
 
-export function GameCard({ game, rank, friend, list = null, following = false, onFollow, onOpen, className }: GameCardProps) {
+export function GameCard({ game, rank, friend, list = null, following = false, onFollow, onListChange, onOpen, className }: GameCardProps) {
   const meta = [game.genres.slice(0, 2).join(" · "), game.hypes ? `${game.hypes.toLocaleString("pl-PL")} obserwujących` : ""]
     .filter(Boolean)
     .join(" · ");
@@ -60,7 +61,7 @@ export function GameCard({ game, rank, friend, list = null, following = false, o
             {following ? <Check aria-hidden className="size-4" /> : <Eye aria-hidden className="size-4" />}
             {following ? "Obserwujesz" : "Obserwuj"}
           </Button>
-          <ListButton value={list} />
+          <ListButton value={list} onChange={onListChange} />
         </div>
         {friend && <FriendNotice {...friend} />}
       </div>
