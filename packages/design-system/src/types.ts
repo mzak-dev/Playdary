@@ -7,7 +7,7 @@ export type Game = {
   platforms: string[];
   releaseDate: number | null;
   score: number | null;
-  follows: number;
+  hypes: number;
   cover: string | null;
 };
 

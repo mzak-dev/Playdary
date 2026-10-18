@@ -15,6 +15,15 @@ const EMBED_BATCH = 16;
 const supabase = createClient(env("SUPABASE_URL"), env("SUPABASE_SERVICE_ROLE_KEY"));
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
+async function withRetry<T>(run: () => PromiseLike<{ data: T; error: unknown }>, attempts = 5) {
+  for (let attempt = 1; ; attempt++) {
+    const { data, error } = await run();
+    if (!error) return data;
+    if (attempt === attempts) throw error;
+    await sleep(2000 * attempt);
+  }
+}
+
 type IgdbGame = {
   id: number;
   name: string;
@@ -43,13 +52,15 @@ async function twitchToken() {
   return ((await response.json()) as { access_token: string }).access_token;
 }
 
-async function fetchPage(token: string, offset: number) {
+const POPULAR_FILTER = { where: "cover != null & total_rating_count > 0", sort: "total_rating_count desc" };
+
+async function fetchPage(token: string, offset: number, { where, sort } = POPULAR_FILTER) {
   const response = await fetch("https://api.igdb.com/v4/games", {
     method: "POST",
     headers: { "Client-ID": env("TWITCH_CLIENT_ID"), Authorization: `Bearer ${token}` },
     body: `fields name,summary,storyline,cover.image_id,screenshots.image_id,videos.video_id,genres.name,themes.name,platforms.abbreviation,platforms.name,first_release_date,total_rating,follows,hypes;
-      where cover != null & total_rating_count > 0;
-      sort total_rating_count desc;
+      where ${where};
+      sort ${sort};
       limit ${PAGE_SIZE}; offset ${offset};`,
   });
   if (!response.ok) throw new Error(`IGDB failed: ${response.status} ${await response.text()}`);
@@ -76,6 +87,8 @@ const toRow = (game: IgdbGame) => ({
 });
 
 async function seedGames() {
+  const { count } = await supabase.from("games").select("id", { count: "exact", head: true });
+  if ((count ?? 0) >= TARGET) return;
   const token = await twitchToken();
   for (let offset = 0; offset < TARGET; offset += PAGE_SIZE) {
     const games = await fetchPage(token, offset);
@@ -87,6 +100,15 @@ async function seedGames() {
   }
 }
 
+async function seedUpcoming() {
+  const token = await twitchToken();
+  const now = Math.floor(Date.now() / 1000);
+  const games = await fetchPage(token, 0, { where: `cover != null & first_release_date > ${now} & hypes > 0`, sort: "hypes desc" });
+  const { error } = await supabase.from("games").upsert(games.map(toRow));
+  if (error) throw error;
+  console.log(`upcoming upserted: ${games.length}`);
+}
+
 type StoredGame = { id: number; name: string; data: { summary: string | null; genres: string[]; themes: string[] } };
 
 const embeddingText = ({ name, data }: StoredGame) =>
@@ -96,26 +118,22 @@ async function embedMissing() {
   const extractor = await pipeline("feature-extraction", "Supabase/gte-small");
   let done = 0;
   for (;;) {
-    const { data, error } = await supabase
-      .from("games")
-      .select("id, name, data")
-      .is("embedding", null)
-      .order("id")
-      .limit(EMBED_BATCH);
-    if (error) throw error;
+    const data = await withRetry(() =>
+      supabase.from("games").select("id, name, data").is("embedding", null).order("id").limit(EMBED_BATCH),
+    );
     if (!data?.length) break;
 
     const batch = data as StoredGame[];
     const output = await extractor(batch.map(embeddingText), { pooling: "mean", normalize: true });
     const vectors = output.tolist() as number[][];
     const rows = batch.map((game, i) => ({ ...game, embedding: JSON.stringify(vectors[i]) }));
-    const { error: updateError } = await supabase.from("games").upsert(rows);
-    if (updateError) throw updateError;
+    await withRetry(() => supabase.from("games").upsert(rows));
     done += batch.length;
     console.log(`embedded: ${done}`);
   }
 }
 
 await seedGames();
-await embedMissing();
+await seedUpcoming();
+if (!process.env.SKIP_EMBED) await embedMissing();
 console.log("seed finished");

@@ -27,7 +27,7 @@ const trackPointer = (e: MouseEvent<HTMLElement>) => {
 };
 
 export function GameCard({ game, rank, friend, list = null, following = false, onFollow, onOpen, className }: GameCardProps) {
-  const meta = [game.genres.slice(0, 2).join(" · "), game.follows ? `${game.follows.toLocaleString("pl-PL")} obserwujących` : ""]
+  const meta = [game.genres.slice(0, 2).join(" · "), game.hypes ? `${game.hypes.toLocaleString("pl-PL")} obserwujących` : ""]
     .filter(Boolean)
     .join(" · ");
 
