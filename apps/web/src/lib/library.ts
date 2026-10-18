@@ -1,5 +1,6 @@
-import type { GameList } from "@playdary/design-system";
+import type { Game, GameList } from "@playdary/design-system";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { GAME_COLUMNS, toGame, type GameRow } from "./games";
 import { supabase } from "./supabase";
 
 type ListsByGame = Record<number, GameList>;
@@ -15,6 +16,16 @@ export const useUserLists = (userId: string) =>
         if (row.lists) byGame[row.game_id] = row.lists.name;
       }
       return byGame;
+    },
+  });
+
+export const useListedGames = (userId: string) =>
+  useQuery({
+    queryKey: ["lists-games", userId],
+    queryFn: async (): Promise<Game[]> => {
+      const { data, error } = await supabase.from("list_items").select(`game_id, games(${GAME_COLUMNS})`);
+      if (error) throw new Error(error.message);
+      return (data as unknown as { games: GameRow | null }[]).flatMap((row) => (row.games ? [toGame(row.games)] : []));
     },
   });
 
@@ -43,7 +54,7 @@ export function useSetList(userId: string) {
       return { previous };
     },
     onError: (_error, _vars, context) => client.setQueryData(key, context?.previous),
-    onSettled: () => client.invalidateQueries({ queryKey: key }),
+    onSettled: () => Promise.all([client.invalidateQueries({ queryKey: key }), client.invalidateQueries({ queryKey: ["lists-games", userId] })]),
   });
 }
 

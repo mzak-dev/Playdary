@@ -33,7 +33,7 @@ export function AppShell({ session, active = "home", children }: AppShellProps) 
         user={user}
         links={NAV_LINKS}
         active={active}
-        onNavigate={(id) => id === "home" && navigate({ to: "/" })}
+        onNavigate={(id) => navigate({ to: id === "lists" ? "/lists" : "/" })}
         suggestions={trimmed.length > 1 ? (search.data ?? []) : []}
         searching={search.isFetching || trimmed !== debounced}
         onSearch={setQuery}

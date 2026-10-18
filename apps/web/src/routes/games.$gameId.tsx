@@ -2,6 +2,8 @@ import { Button, Countdown, FriendNotice, Gallery, GameCover, GameRow, ListButto
 import { createFileRoute, useNavigate, useRouter } from "@tanstack/react-router";
 import { ArrowLeft, Check, Eye } from "lucide-react";
 import { AppShell } from "../components/app-shell";
+import { AgeRatings, Languages, Links, Multiplayer, PcRequirements, Related, Releases, TimeToBeat } from "../components/game-sections";
+import { tr } from "../lib/labels";
 import { requireSession } from "../lib/auth";
 import { useFollows, useFriends, useGame, useSimilar, useToggleFollow, type GameDetail } from "../lib/games";
 import { useMyRating, useSetList, useSetRating, useUserLists } from "../lib/library";
@@ -66,6 +68,7 @@ function GamePage() {
 
   const open = (id: number) => navigate({ to: "/games/$gameId", params: { gameId: String(id) } });
   const data = detail.data;
+  const details = data?.details ?? null;
 
   return (
     <AppShell session={session} active="">
@@ -126,6 +129,8 @@ function GamePage() {
                   <ListButton size="md" value={lists.data?.[gameId] ?? null} onChange={(list) => setList.mutate({ gameId, list })} />
                 </div>
 
+                {details && <TimeToBeat data={details.timeToBeat} />}
+
                 <div className="flex flex-col gap-1">
                   <Label>Twoja ocena</Label>
                   <Rating value={rating.data ?? 0} onChange={(score) => setRating.mutate(score)} disabled={rating.isPending} />
@@ -151,8 +156,33 @@ function GamePage() {
                 <InfoRow label="Data premiery" value={formatDate(data.game.releaseDate)} />
                 <InfoRow label="Platformy" value={data.game.platforms.join(", ") || "–"} />
                 <InfoRow label="Gatunki" value={data.game.genres.join(", ") || "–"} />
+                {details && (
+                  <>
+                    <InfoRow label="Deweloper" value={details.developers.join(", ") || "–"} />
+                    <InfoRow label="Wydawca" value={details.publishers.join(", ") || "–"} />
+                    <InfoRow label="Tryby gry" value={details.modes.map(tr).join(", ") || "–"} />
+                    <InfoRow label="Perspektywa" value={details.perspectives.map(tr).join(", ") || "–"} />
+                    <InfoRow label="Typ" value={details.gameType ? tr(details.gameType) : "–"} />
+                  </>
+                )}
               </section>
             </div>
+
+            {details && (
+              <>
+                <div className="flex flex-wrap gap-12">
+                  <AgeRatings items={details.ageRatings} />
+                  <Links items={details.websites} />
+                </div>
+                <Releases items={details.releases} />
+                <Multiplayer items={details.multiplayer} />
+                <Languages items={details.languages} />
+                <div className="flex flex-wrap gap-12">
+                  <PcRequirements steamId={details.steamId} />
+                </div>
+                <Related related={details.related} onOpen={open} />
+              </>
+            )}
 
             <section className="flex flex-col gap-4">
               <h2 className="font-display text-[28px] leading-[34px] font-bold tracking-tight">Podobne gry</h2>

@@ -1,7 +1,7 @@
 import { animate, stagger } from "animejs";
 import { Fragment, useEffect, useRef, useState, type ReactNode } from "react";
 import { Button } from "./button";
-import DotGrid from "./dot-grid";
+import { PageHero } from "./page-hero";
 
 export type Quote = { text: string; game: string; year: number };
 
@@ -40,22 +40,15 @@ export function QuoteHero({ user, quotes, interval = 9000, onOpenGame, children 
   if (!quote) return null;
 
   return (
-    <section
+    <PageHero
       aria-label="Cytat z gry"
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
       onFocus={() => setPaused(true)}
       onBlur={() => setPaused(false)}
-      className="relative -mt-[68px] overflow-hidden px-4 pt-[108px] pb-[120px] sm:px-8"
+      className="pb-[120px]"
     >
-      <div aria-hidden className="pointer-events-none absolute inset-0 [mask-image:linear-gradient(to_bottom,#000_55%,rgba(0,0,0,0.25))]">
-        <DotGrid dotSize={3} gap={25} baseColor="#a1a1aa" activeColor="#1fa9ec" opacity={0.35} proximity={150} />
-      </div>
-      <div aria-hidden className="pointer-events-none absolute inset-0">
-        <i className="absolute top-[-80px] left-[6%] size-[340px] rounded-full bg-primary opacity-[0.28] blur-[80px]" />
-        <i className="absolute top-[30px] right-[4%] size-[300px] rounded-full bg-cover-rose opacity-[0.28] blur-[80px]" />
-      </div>
-      <div className="relative z-[2] flex flex-col gap-5">
+      <>
         <span className="text-sm leading-5 font-medium text-muted-foreground">
           Witaj,{" "}
           <strong className="animate-[shine_3.2s_linear_infinite] bg-[linear-gradient(110deg,var(--foreground)_35%,var(--primary)_50%,var(--foreground)_65%)] bg-[length:250%_100%] bg-clip-text font-bold text-transparent">
@@ -80,8 +73,8 @@ export function QuoteHero({ user, quotes, interval = 9000, onOpenGame, children 
             Zobacz grę
           </Button>
         </div>
-      </div>
-      {children && <div className="relative z-[2] mt-9 -mx-4 sm:-mx-8">{children}</div>}
-    </section>
+        {children && <div className="mt-4 -mx-4 sm:-mx-8">{children}</div>}
+      </>
+    </PageHero>
   );
 }

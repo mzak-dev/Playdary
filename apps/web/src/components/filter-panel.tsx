@@ -1,4 +1,4 @@
-import { Chip, SegmentedControl, SelectField } from "@playdary/design-system";
+import { Chip, SegmentedControl, SelectField, Switch } from "@playdary/design-system";
 import type { ReactNode } from "react";
 import { GENRES, PERIODS, PLATFORMS, SCORES, SORTS, type Filters } from "../lib/filters";
 
@@ -56,6 +56,10 @@ export function FilterPanel({ filters, onChange }: FilterPanelProps) {
             </option>
           ))}
         </SelectField>
+        <span className="ml-3 inline-flex items-center gap-2.5 text-[13px] leading-[18px] font-medium">
+          <Switch label="Ukryj gry z moich list" checked={filters.hideListed} onChange={(hideListed) => set({ hideListed })} />
+          Ukryj gry z moich list
+        </span>
       </Row>
     </div>
   );

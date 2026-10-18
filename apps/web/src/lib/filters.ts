@@ -56,12 +56,13 @@ export type Filters = {
   period: (typeof PERIODS)[number]["value"];
   minScore: number;
   sort: (typeof SORTS)[number]["value"];
+  hideListed: boolean;
 };
 
-export const DEFAULT_FILTERS: Filters = { tab: "Popularne", platforms: [], genres: [], period: "any", minScore: 0, sort: "default" };
+export const DEFAULT_FILTERS: Filters = { tab: "Popularne", platforms: [], genres: [], period: "any", minScore: 0, sort: "default", hideListed: false };
 
 export const activeFilterCount = (f: Filters) =>
-  f.platforms.length + f.genres.length + (f.period !== "any" ? 1 : 0) + (f.minScore ? 1 : 0) + (f.sort !== "default" ? 1 : 0);
+  f.platforms.length + f.genres.length + (f.period !== "any" ? 1 : 0) + (f.minScore ? 1 : 0) + (f.sort !== "default" ? 1 : 0) + (f.hideListed ? 1 : 0);
 
 export const toRpcParams = (f: Filters) => {
   const picked = GENRES.filter((g) => f.genres.includes(g.label));
@@ -73,5 +74,6 @@ export const toRpcParams = (f: Filters) => {
     p_period: f.period,
     p_min_score: f.minScore,
     p_sort: f.sort,
+    p_hide_listed: f.hideListed,
   };
 };

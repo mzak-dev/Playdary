@@ -39,6 +39,54 @@ const PL: Record<string, string> = {
   "Card & Board Game": "Karciana",
   Music: "Muzyczna",
   "Quiz/Trivia": "Quiz",
+  "Single player": "Jednoosobowa",
+  Multiplayer: "Wieloosobowa",
+  "Co-operative": "Kooperacja",
+  "Split screen": "Podzielony ekran",
+  "Massively Multiplayer Online (MMO)": "MMO",
+  "Battle Royale": "Battle royale",
+  "First person": "Z pierwszej osoby",
+  "Third person": "Z trzeciej osoby",
+  "Bird view / Isometric": "Izometryczna",
+  "Side view": "Z boku",
+  Text: "Tekstowa",
+  Auditory: "Dźwiękowa",
+  "Virtual Reality": "VR",
+  "Main Game": "Gra podstawowa",
+  DLC: "DLC",
+  Expansion: "Dodatek",
+  "Standalone Expansion": "Samodzielny dodatek",
+  Remake: "Remake",
+  Remaster: "Remaster",
+  Port: "Port",
+  Bundle: "Zestaw",
+  "Expanded Game": "Rozszerzona wersja",
 };
+
+export const REGIONS: Record<string, string> = {
+  worldwide: "Cały świat",
+  europe: "Europa",
+  north_america: "Ameryka Płn.",
+  australia: "Australia",
+  new_zealand: "Nowa Zelandia",
+  japan: "Japonia",
+  china: "Chiny",
+  asia: "Azja",
+  korea: "Korea",
+  brazil: "Brazylia",
+};
+
+export const RELEASE_STATUSES: Record<string, string> = {
+  "Full Release": "Pełna premiera",
+  "Early Access": "Wczesny dostęp",
+  Alpha: "Alfa",
+  Beta: "Beta",
+  Offline: "Offline",
+  Cancelled: "Anulowana",
+  Rumored: "Plotka",
+  Delisted: "Wycofana",
+};
+
+export const tr = (value: string) => PL[value] ?? value;
 
 export const polishTags = (...groups: (string[] | null)[]) => [...new Set(groups.flatMap((group) => group ?? []).map((tag) => PL[tag] ?? tag))];

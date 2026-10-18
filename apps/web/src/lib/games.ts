@@ -5,7 +5,7 @@ import { toRpcParams, type Filters } from "./filters";
 import { polishTags } from "./labels";
 import { supabase } from "./supabase";
 
-type GameRow = {
+export type GameRow = {
   id: number;
   name: string;
   hypes: number;
@@ -17,12 +17,13 @@ type GameRow = {
   platforms: string[] | null;
 };
 
-const COLUMNS =
-  "id, name, hypes, score, release_date, cover:data->>cover, genres:data->genres, themes:data->themes, platforms:data->platforms";
 const PAGE_SIZE = 24;
 const STALE_TIME = 5 * 60_000;
 
-const toGame = (row: GameRow): Game => ({
+export const GAME_COLUMNS =
+  "id, name, hypes, score, release_date, cover:data->>cover, genres:data->genres, themes:data->themes, platforms:data->platforms";
+
+export const toGame = (row: GameRow): Game => ({
   id: row.id,
   title: row.name,
   genres: polishTags(row.themes, row.genres),
@@ -40,7 +41,7 @@ const toGames = ({ data, error }: Result) => {
   return ((data ?? []) as GameRow[]).map(toGame);
 };
 
-const games = () => supabase.from("games").select(COLUMNS);
+const games = () => supabase.from("games").select(GAME_COLUMNS);
 
 export const useTopUpcoming = () =>
   useQuery({
@@ -76,6 +77,46 @@ export const useBrowse = (filters: Filters) =>
 
 type SearchRow = { id: number; name: string; data: { cover: string | null; genres: string[]; themes: string[]; platforms: string[] } };
 
+type Ref = { id: number; name: string };
+
+export type Details = {
+  ageRatings: { organization: string | null; rating: string | null; descriptors: string[] }[];
+  releases: { platform: string | null; date: number | null; region: string | null; status: string | null }[];
+  multiplayer: {
+    platform: string | null;
+    onlineMax: number;
+    onlineCoopMax: number;
+    offlineMax: number;
+    offlineCoopMax: number;
+    splitscreen: boolean;
+    campaignCoop: boolean;
+    lanCoop: boolean;
+    dropIn: boolean;
+  }[];
+  languages: { name: string; audio: boolean; subtitles: boolean; interface: boolean }[];
+  websites: { type: string; url: string }[];
+  steamId: string | null;
+  developers: string[];
+  publishers: string[];
+  modes: string[];
+  perspectives: string[];
+  gameType: string | null;
+  related: {
+    dlcs: Ref[];
+    expansions: Ref[];
+    standaloneExpansions: Ref[];
+    remakes: Ref[];
+    remasters: Ref[];
+    ports: Ref[];
+    bundles: Ref[];
+    parent: Ref | null;
+    versionParent: Ref | null;
+    franchises: string[];
+    collections: string[];
+  };
+  timeToBeat: { hastily: number | null; normally: number | null; completely: number | null; count: number } | null;
+};
+
 export type GameDetail = {
   game: Game;
   summary: string | null;
@@ -83,10 +124,12 @@ export type GameDetail = {
   screenshots: string[];
   videos: string[];
   ratingCount: number | null;
+  details: Details | null;
 };
 
 type DetailRow = Omit<GameRow, "cover" | "genres" | "themes" | "platforms"> & {
   rating_count: number | null;
+  details: Details | null;
   data: {
     cover: string | null;
     genres: string[];
@@ -106,7 +149,7 @@ export const useGame = (gameId: number) =>
     queryFn: async (): Promise<GameDetail | null> => {
       const { data, error } = await supabase
         .from("games")
-        .select("id, name, hypes, score, release_date, rating_count, data")
+        .select("id, name, hypes, score, release_date, rating_count, data, details")
         .eq("id", gameId)
         .maybeSingle();
       if (error) throw new Error(error.message);
@@ -119,7 +162,35 @@ export const useGame = (gameId: number) =>
         screenshots: row.data.screenshots,
         videos: row.data.videos,
         ratingCount: row.rating_count,
+        details: row.details,
       };
+    },
+  });
+
+export const useExistingGameIds = (ids: number[]) =>
+  useQuery({
+    queryKey: ["games", "existing", ids],
+    enabled: ids.length > 0,
+    staleTime: STALE_TIME,
+    queryFn: async () => {
+      const { data, error } = await supabase.from("games").select("id").in("id", ids);
+      if (error) throw new Error(error.message);
+      return new Set(data.map((row) => row.id as number));
+    },
+  });
+
+export type Requirements = { minimum: { key: string; value: string }[]; recommended: { key: string; value: string }[] };
+
+export const useRequirements = (steamId: string | null) =>
+  useQuery({
+    queryKey: ["requirements", steamId],
+    enabled: steamId !== null,
+    staleTime: STALE_TIME,
+    retry: false,
+    queryFn: async () => {
+      const { data, error } = await supabase.functions.invoke<Requirements>("steam-requirements", { body: { appId: steamId } });
+      if (error || !data) throw new Error(error?.message ?? "Brak danych");
+      return data;
     },
   });
 
