@@ -1,4 +1,4 @@
-import { Button, Countdown, FriendNotice, Gallery, GameCover, GameRow, ListButton, Rating, ScoreBadge, Skeleton, StatTile, Tag, type Slide } from "@playdary/design-system";
+import { Button, Countdown, FriendNotice, Gallery, GameCover, GameRow, LineSidebar, ListButton, Rating, ScoreBadge, Skeleton, StatTile, Tag, type Slide } from "@playdary/design-system";
 import { createFileRoute, useNavigate, useRouter } from "@tanstack/react-router";
 import { ArrowLeft, Check, Eye } from "lucide-react";
 import { AppShell } from "../components/app-shell";
@@ -69,6 +69,18 @@ function GamePage() {
   const open = (id: number) => navigate({ to: "/games/$gameId", params: { gameId: String(id) } });
   const data = detail.data;
   const details = data?.details ?? null;
+  const sections = [
+    "O grze",
+    "Informacje",
+    ...(details ? ["Klasyfikacja wiekowa"] : []),
+    ...(details?.releases.length ? ["Premiery"] : []),
+    ...(details?.multiplayer.length ? ["Wieloosobowa"] : []),
+    ...(details?.languages.length ? ["Języki"] : []),
+    ...(details ? ["Powiązane"] : []),
+    "Podobne gry",
+  ];
+  const jumpTo = (_index: number, label: string) =>
+    [...document.querySelectorAll("h2")].find((heading) => heading.textContent?.startsWith(label))?.scrollIntoView({ behavior: "smooth", block: "start" });
 
   return (
     <AppShell session={session} active="">
@@ -86,6 +98,21 @@ function GamePage() {
 
         {data && (
           <>
+            <div className="fixed top-1/2 left-4 z-40 hidden -translate-y-1/2 min-[1800px]:block">
+              <LineSidebar
+                items={sections}
+                accentColor="var(--primary)"
+                textColor="var(--muted-foreground)"
+                markerColor="var(--input)"
+                showIndex={false}
+                falloff="sharp"
+                markerLength={40}
+                tickScale={0.5}
+                itemGap={14}
+                fontSize={0.9}
+                onItemClick={jumpTo}
+              />
+            </div>
             <div className="flex flex-wrap items-start gap-12">
               <div className="min-w-0 max-w-[640px] flex-[1_1_440px]">
                 {buildSlides(data).length > 0 ? <Gallery slides={buildSlides(data)} /> : <GameCover title={data.game.title} cover={data.game.cover} className="rounded-xl" />}
