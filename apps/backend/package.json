@@ -1,22 +1,23 @@
 {
-    "name":  "@playdary/backend",
-    "version":  "0.0.0",
-    "private":  true,
-    "scripts":  {
-                    "dev":  "supabase start",
-                    "stop":  "supabase stop",
-                    "db:reset":  "supabase db reset",
-                    "db:new":  "supabase migration new",
-                    "seed":  "tsx --env-file=.env scripts/seed-igdb.ts",
-                    "typecheck":  "tsc"
-                },
-    "devDependencies":  {
-                            "@types/node":  "^26.6.5",
-                            "supabase":  "^2.121.0",
-                            "tsx":  "^4.23.15"
-                        },
-    "dependencies":  {
-                         "@huggingface/transformers":  "^4.3.1",
-                         "@supabase/supabase-js":  "^2.118.0"
-                     }
+  "name": "@playdary/backend",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "supabase start",
+    "stop": "supabase stop",
+    "db:reset": "supabase db reset",
+    "db:new": "supabase migration new",
+    "seed": "tsx --env-file=.env scripts/seed-igdb.ts",
+    "typecheck": "tsc"
+  },
+  "dependencies": {
+    "@huggingface/transformers": "^4.3.1",
+    "@supabase/supabase-js": "^2.118.0"
+  },
+  "devDependencies": {
+    "@types/node": "^26.6.5",
+    "supabase": "^2.121.0",
+    "tsx": "^4.23.15"
+  }
 }
