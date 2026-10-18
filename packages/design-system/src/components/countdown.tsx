@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 
 const pad = (n: number) => String(n).padStart(2, "0");
 
-export function Countdown({ to }: { to: number | null }) {
+export function Countdown({ to, compact = false }: { to: number | null; compact?: boolean }) {
   const [now, setNow] = useState(Date.now);
 
   useEffect(() => {
@@ -16,10 +16,22 @@ export function Countdown({ to }: { to: number | null }) {
   if (diff <= 0) return <span className="text-sm font-bold text-success">Już dostępna</span>;
 
   const seconds = Math.floor(diff / 1000);
+  const days = Math.floor(seconds / 86400);
+  const hours = Math.floor((seconds % 86400) / 3600);
+  const minutes = Math.floor((seconds % 3600) / 60);
+
+  if (compact) {
+    return (
+      <span role="timer" className="font-display text-sm font-bold text-primary tabular-nums">
+        {days} d {pad(hours)} h {pad(minutes)} m
+      </span>
+    );
+  }
+
   const segments = [
-    [String(Math.floor(seconds / 86400)), "dni"],
-    [pad(Math.floor((seconds % 86400) / 3600)), "godz."],
-    [pad(Math.floor((seconds % 3600) / 60)), "min"],
+    [String(days), "dni"],
+    [pad(hours), "godz."],
+    [pad(minutes), "min"],
     [pad(seconds % 60), "sek"],
   ] as const;
 

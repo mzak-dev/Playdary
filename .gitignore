@@ -7,3 +7,4 @@ dist
 .remember
 apps/backend/supabase/.temp
 apps/web/src/routeTree.gen.ts
+.claude

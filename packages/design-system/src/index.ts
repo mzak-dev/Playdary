@@ -1,4 +1,14 @@
 export { cn } from "./lib/cn";
+export type { Friend, Game, GameList } from "./types";
 export { Button, type ButtonProps } from "./components/button";
 export { ScoreBadge } from "./components/score-badge";
 export { Countdown } from "./components/countdown";
+export { GameCover } from "./components/game-cover";
+export { FriendNotice } from "./components/friend-notice";
+export { ListButton } from "./components/list-button";
+export { GameCard } from "./components/game-card";
+export { SegmentedControl } from "./components/segmented-control";
+export { Rail } from "./components/rail";
+export { ReleaseTicker } from "./components/release-ticker";
+export { QuoteHero, type Quote } from "./components/quote-hero";
+export { NavBar } from "./components/nav-bar";
