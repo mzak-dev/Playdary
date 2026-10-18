@@ -1,5 +1,6 @@
 import { pipeline } from "@huggingface/transformers";
 import { createClient } from "@supabase/supabase-js";
+import { DETAIL_FIELDS, toDetails, type IgdbDetailFields, type TimeToBeat } from "./igdb-details";
 
 const env = (key: string) => {
   const value = process.env[key];
@@ -11,6 +12,7 @@ const TARGET = Number(process.env.SEED_LIMIT ?? 20_000);
 const PAGE_SIZE = 500;
 const IGDB_DELAY_MS = 260;
 const EMBED_BATCH = 16;
+const UPSERT_CHUNK = 100;
 
 const supabase = createClient(env("SUPABASE_URL"), env("SUPABASE_SERVICE_ROLE_KEY"));
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
@@ -40,7 +42,7 @@ type IgdbGame = {
   total_rating_count?: number;
   follows?: number;
   hypes?: number;
-};
+} & IgdbDetailFields;
 
 async function twitchToken() {
   const params = new URLSearchParams({
@@ -59,7 +61,7 @@ async function fetchPage(token: string, offset: number, { where, sort } = POPULA
   const response = await fetch("https://api.igdb.com/v4/games", {
     method: "POST",
     headers: { "Client-ID": env("TWITCH_CLIENT_ID"), Authorization: `Bearer ${token}` },
-    body: `fields name,summary,storyline,cover.image_id,screenshots.image_id,videos.video_id,genres.name,themes.name,platforms.abbreviation,platforms.name,first_release_date,total_rating,total_rating_count,follows,hypes;
+    body: `fields name,summary,storyline,cover.image_id,screenshots.image_id,videos.video_id,genres.name,themes.name,platforms.abbreviation,platforms.name,first_release_date,total_rating,total_rating_count,follows,hypes,${DETAIL_FIELDS};
       where ${where};
       sort ${sort};
       limit ${PAGE_SIZE}; offset ${offset};`,
@@ -68,10 +70,30 @@ async function fetchPage(token: string, offset: number, { where, sort } = POPULA
   return (await response.json()) as IgdbGame[];
 }
 
-const toRow = (game: IgdbGame) => ({
+async function fetchTimeToBeat(token: string, ids: number[]) {
+  const response = await fetch("https://api.igdb.com/v4/game_time_to_beats", {
+    method: "POST",
+    headers: { "Client-ID": env("TWITCH_CLIENT_ID"), Authorization: `Bearer ${token}` },
+    body: `fields game_id,hastily,normally,completely,count; where game_id = (${ids.join(",")}); limit ${PAGE_SIZE};`,
+  });
+  if (!response.ok) throw new Error(`IGDB time to beat failed: ${response.status}`);
+  const rows = (await response.json()) as ({ game_id: number } & Partial<TimeToBeat>)[];
+  return new Map(
+    rows.map((row) => [row.game_id, { hastily: row.hastily ?? null, normally: row.normally ?? null, completely: row.completely ?? null, count: row.count ?? 0 }]),
+  );
+}
+
+async function toRows(token: string, games: IgdbGame[]) {
+  const timeToBeat = await fetchTimeToBeat(token, games.map((game) => game.id));
+  await sleep(IGDB_DELAY_MS);
+  return games.map((game) => toRow(game, timeToBeat.get(game.id) ?? null));
+}
+
+const toRow = (game: IgdbGame, timeToBeat: TimeToBeat | null) => ({
   id: game.id,
   name: game.name,
   rating_count: game.total_rating_count ?? null,
+  details: toDetails(game, timeToBeat),
   data: {
     summary: game.summary ?? null,
     storyline: game.storyline ?? null,
@@ -88,15 +110,20 @@ const toRow = (game: IgdbGame) => ({
   },
 });
 
+async function upsertRows(rows: ReturnType<typeof toRow>[]) {
+  for (let start = 0; start < rows.length; start += UPSERT_CHUNK) {
+    await withRetry(() => supabase.from("games").upsert(rows.slice(start, start + UPSERT_CHUNK)));
+  }
+}
+
 async function seedGames() {
   const { count } = await supabase.from("games").select("id", { count: "exact", head: true });
   if (!process.env.SEED_REFRESH && (count ?? 0) >= TARGET) return;
   const token = await twitchToken();
-  for (let offset = 0; offset < TARGET; offset += PAGE_SIZE) {
+  for (let offset = Number(process.env.SEED_OFFSET ?? 0); offset < TARGET; offset += PAGE_SIZE) {
     const games = await fetchPage(token, offset);
     if (games.length === 0) break;
-    const { error } = await supabase.from("games").upsert(games.map(toRow));
-    if (error) throw error;
+    await upsertRows(await toRows(token, games));
     console.log(`games upserted: ${offset + games.length}`);
     await sleep(IGDB_DELAY_MS);
   }
@@ -106,8 +133,7 @@ async function seedUpcoming() {
   const token = await twitchToken();
   const now = Math.floor(Date.now() / 1000);
   const games = await fetchPage(token, 0, { where: `cover != null & first_release_date > ${now} & hypes > 0`, sort: "hypes desc" });
-  const { error } = await supabase.from("games").upsert(games.map(toRow));
-  if (error) throw error;
+  await upsertRows(await toRows(token, games));
   console.log(`upcoming upserted: ${games.length}`);
 }
 
