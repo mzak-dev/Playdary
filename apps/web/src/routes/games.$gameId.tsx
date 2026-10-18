@@ -109,6 +109,7 @@ function GamePage() {
                 markerColor="var(--input)"
                 showIndex={false}
                 falloff="sharp"
+                proximityRadius={40}
                 markerLength={40}
                 tickScale={0.5}
                 itemGap={14}
