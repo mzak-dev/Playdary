@@ -2,6 +2,7 @@ import { NavBar } from "@playdary/design-system";
 import type { Session } from "@supabase/supabase-js";
 import { useNavigate } from "@tanstack/react-router";
 import { useState, type ReactNode } from "react";
+import { AiChat } from "./ai-chat";
 import { useServerEmbeddings } from "../lib/embed-settings";
 import { useSearch } from "../lib/games";
 import { useUsername } from "../lib/profile";
@@ -45,6 +46,7 @@ export function AppShell({ session, active = "home", children }: AppShellProps) 
         onSignOut={signOut}
       />
       {children}
+      <AiChat />
     </div>
   );
 }
