@@ -38,7 +38,7 @@ const loadChain = (): ModelSpec[] => {
 };
 
 class ProviderError extends Error {
-  constructor(public status: number, public retryAfter: number | null) {
+  constructor(public status: number, public retryAfter: number | null, public detail = "") {
     super(`provider ${status}`);
   }
 }
@@ -101,8 +101,8 @@ const callProvider = async (model: ModelSpec, messages: ChatMessage[], withTools
     signal: AbortSignal.timeout(PROVIDER_TIMEOUT_MS),
   });
   if (!response.ok || !response.body) {
-    await response.body?.cancel();
-    throw new ProviderError(response.status, Number(response.headers.get("retry-after")) || null);
+    const detail = await response.text().catch(() => "");
+    throw new ProviderError(response.status, Number(response.headers.get("retry-after")) || null, detail.slice(0, 300));
   }
   return response.body;
 };
@@ -191,7 +191,7 @@ Deno.serve(async (req) => {
         admin.from("ai_model_health").upsert({
           model_id: model.id,
           cooldown_until: new Date(Date.now() + cooldownMs(error.status, error.retryAfter)).toISOString(),
-          reason: String(error.status),
+          reason: `${error.status} ${model.provider}: ${error.detail}`.trim(),
           updated_at: new Date().toISOString(),
         });
 
@@ -223,7 +223,7 @@ Deno.serve(async (req) => {
             const outcome = await runTool(userDb, call);
             for (const card of outcome.cards) if (cards.size < MAX_CARDS && typeof card.id === "number") cards.set(card.id, card);
             send("tool", { name: call.function.name, state: "done", count: outcome.cards.length });
-            messages.push({ role: "tool", tool_call_id: call.id, content: outcome.content });
+            messages.push({ role: "tool", tool_call_id: call.id, name: call.function.name, content: outcome.content });
           }
         }
 

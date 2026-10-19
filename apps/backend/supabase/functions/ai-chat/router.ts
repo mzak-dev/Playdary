@@ -1,10 +1,10 @@
 export type Role = "user" | "assistant" | "system" | "tool";
 
-export type ChatMessage = { role: Role; content: string | null; tool_calls?: ToolCall[]; tool_call_id?: string };
+export type ChatMessage = { role: Role; content: string | null; tool_calls?: ToolCall[]; tool_call_id?: string; name?: string };
 
-export type ToolCall = { id: string; type: "function"; function: { name: string; arguments: string } };
+export type ToolCall = { id: string; type: "function"; function: { name: string; arguments: string }; extra_content?: unknown };
 
-export type ToolCallDelta = { index?: number; id?: string; function?: { name?: string; arguments?: string } };
+export type ToolCallDelta = { index?: number; id?: string; function?: { name?: string; arguments?: string }; extra_content?: unknown };
 
 export type Cooldowns = Map<string, number>;
 
@@ -36,6 +36,7 @@ export class ToolCallAccumulator {
 
   add(delta: ToolCallDelta) {
     const call = this.find(delta);
+    if (delta.extra_content) call.extra_content = delta.extra_content;
     const name = delta.function?.name;
     if (name && call.function.name !== name) call.function.name += name;
     if (delta.function?.arguments) call.function.arguments += delta.function.arguments;

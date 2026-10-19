@@ -11,8 +11,8 @@ export const PROVIDERS: Record<ProviderId, { url: string; keyEnv: string }> = {
 export const DEFAULT_CHAIN: ModelSpec[] = [
   { id: "gemini-flash-latest", provider: "gemini", label: "Gemini Flash", tools: true },
   { id: "gemini-flash-lite-latest", provider: "gemini", label: "Gemini Flash-Lite", tools: true },
-  { id: "gemini-2.5-flash", provider: "gemini", label: "Gemini 2.5 Flash", tools: true },
-  { id: "gemini-2.5-flash-lite", provider: "gemini", label: "Gemini 2.5 Flash-Lite", tools: true },
+  { id: "gemini-3.5-flash", provider: "gemini", label: "Gemini 3.5 Flash", tools: true },
+  { id: "gemini-3.1-flash-lite", provider: "gemini", label: "Gemini 3.1 Flash-Lite", tools: true },
   { id: "llama-3.3-70b-versatile", provider: "groq", label: "Llama 3.3 70B (Groq)", tools: true },
   { id: "openrouter/free", provider: "openrouter", label: "OpenRouter Free", tools: true },
 ];
