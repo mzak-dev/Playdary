@@ -75,7 +75,7 @@ function Home() {
         )}
       </QuoteHero>
 
-      <div className="relative z-[3] -mt-[72px] flex min-h-[55vh] flex-col gap-14 rounded-t-xl border border-b-0 border-white/5 bg-card/70 px-4 pt-10 pb-18 shadow-[inset_0_1px_0_rgba(255,255,255,0.06),0_-24px_60px_rgba(0,0,0,0.35)] backdrop-blur-xl sm:px-8">
+      <div className="relative z-[3] -mt-[72px] flex min-h-[55vh] flex-col gap-14 rounded-t-xl border border-b-0 border-white/5 bg-card/90 px-4 sm:bg-card/70 pt-10 pb-18 shadow-[inset_0_1px_0_rgba(255,255,255,0.06),0_-24px_60px_rgba(0,0,0,0.35)] sm:backdrop-blur-xl sm:px-8">
         <Rail title="Najbardziej wyczekiwane" subtitle="Top 10 nadchodzących gier według liczby obserwujących w IGDB, z odliczaniem do premiery.">
           {top.isPending ? skeletons(5, "w-[300px] shrink-0") : top.data?.map((game, i) => card(game, i + 1, "w-[300px] shrink-0"))}
         </Rail>
