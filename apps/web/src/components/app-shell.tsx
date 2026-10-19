@@ -43,6 +43,7 @@ export function AppShell({ session, active = "home", children }: AppShellProps) 
         onPick={(id) => navigate({ to: "/games/$gameId", params: { gameId: String(id) } })}
         serverEmbeddings={serverEmbeddings}
         onServerEmbeddingsChange={setServerEmbeddings}
+        onOpenProfile={() => navigate({ to: "/profile" })}
         onSignOut={signOut}
       />
       {children}
