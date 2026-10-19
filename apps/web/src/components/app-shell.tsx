@@ -2,6 +2,7 @@ import { NavBar } from "@playdary/design-system";
 import type { Session } from "@supabase/supabase-js";
 import { useNavigate } from "@tanstack/react-router";
 import { useState, type ReactNode } from "react";
+import { useServerEmbeddings } from "../lib/embed-settings";
 import { useSearch } from "../lib/games";
 import { useUsername } from "../lib/profile";
 import { supabase } from "../lib/supabase";
@@ -17,6 +18,7 @@ type AppShellProps = { session: Session; active?: string; children: ReactNode };
 export function AppShell({ session, active = "home", children }: AppShellProps) {
   const navigate = useNavigate();
   const user = useUsername(session);
+  const [serverEmbeddings, setServerEmbeddings] = useServerEmbeddings();
   const [query, setQuery] = useState("");
   const trimmed = query.trim();
   const debounced = useDebounced(trimmed);
@@ -38,6 +40,8 @@ export function AppShell({ session, active = "home", children }: AppShellProps) 
         searching={search.isFetching || trimmed !== debounced}
         onSearch={setQuery}
         onPick={(id) => navigate({ to: "/games/$gameId", params: { gameId: String(id) } })}
+        serverEmbeddings={serverEmbeddings}
+        onServerEmbeddingsChange={setServerEmbeddings}
         onSignOut={signOut}
       />
       {children}

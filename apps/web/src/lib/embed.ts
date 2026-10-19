@@ -1,3 +1,6 @@
+import { readServerEmbeddings } from "./embed-settings";
+import { supabase } from "./supabase";
+
 type Pending = { resolve: (vector: number[]) => void; reject: (error: Error) => void };
 
 const pending = new Map<number, Pending>();
@@ -17,9 +20,17 @@ const getWorker = () => {
   return worker;
 };
 
-export const embedText = (text: string) =>
+const embedOnDevice = (text: string) =>
   new Promise<number[]>((resolve, reject) => {
     const id = nextId++;
     pending.set(id, { resolve, reject });
     getWorker().postMessage({ id, text });
   });
+
+const embedOnServer = async (text: string) => {
+  const { data, error } = await supabase.functions.invoke<{ vector: number[] }>("embed-query", { body: { text } });
+  if (error || !data) throw new Error(error?.message ?? "Brak wektora");
+  return data.vector;
+};
+
+export const embedText = (text: string) => (readServerEmbeddings() ? embedOnServer(text) : embedOnDevice(text));
