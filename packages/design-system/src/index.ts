@@ -13,6 +13,7 @@ export { Rail } from "./components/rail";
 export { ReleaseTicker } from "./components/release-ticker";
 export { QuoteHero, type Quote } from "./components/quote-hero";
 export { Rating } from "./components/rating";
+export { Avatar } from "./components/avatar";
 export { Tag } from "./components/tag";
 export { StatTile } from "./components/stat-tile";
 export { Gallery, type Slide } from "./components/gallery";

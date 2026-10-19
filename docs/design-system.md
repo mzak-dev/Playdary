@@ -14,7 +14,7 @@ Source: the Plogamer design system artifact. Tokens live in `packages/design-sys
 
 | Component | Status |
 | --- | --- |
-| Button, ScoreBadge, Countdown | ported |
+| Button, ScoreBadge, Countdown, Avatar | ported |
 | Badge, Rating, ListButton, FriendNotice | to port |
 | GameCover, GameCard, GameRow | to port |
 | QuoteBanner, NavBar, SubNav, SearchField | to port |
@@ -24,3 +24,9 @@ Source: the Plogamer design system artifact. Tokens live in `packages/design-sys
 - shadcn/ui: add components with the CLI into `packages/design-system`.
 - React Bits: copy-paste only (SpotlightCard for GameCard, SplitText for QuoteBanner, CountUp for follows).
 - anime.js: gallery transitions and list reordering; respect `prefers-reduced-motion`.
+
+## Profile
+
+- `/profile` has two sections: Przegląd (own ratings, friends) and Ustawienia (account, theme, notifications, privacy).
+- `profiles.privacy` and `profiles.notifications` are stored but not enforced yet; enforcement arrives with the friends system.
+- Theme choice lives in `localStorage` (`playdary:theme`) and toggles the `light` class on `html`.

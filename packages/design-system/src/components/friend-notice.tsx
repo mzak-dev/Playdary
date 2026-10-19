@@ -1,5 +1,6 @@
 import { Eye, Star } from "lucide-react";
 import type { Friend } from "../types";
+import { Avatar } from "./avatar";
 
 const people = (n: number) => (n === 1 ? "osoba" : n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 12 || n % 100 > 14) ? "osoby" : "osób");
 
@@ -35,9 +36,7 @@ export function FriendNotice({ kind, users }: Friend) {
     <p className="flex items-center gap-2.5 rounded-full bg-secondary py-1.5 pr-3.5 pl-1.5 text-[13px] leading-[18px] font-medium text-muted-foreground">
       <span aria-hidden className="flex shrink-0">
         {users.slice(0, 3).map((user) => (
-          <span key={user.name} className="-ml-2 grid size-[26px] place-items-center rounded-full bg-accent text-[11px] font-bold text-accent-foreground uppercase ring-2 ring-secondary first:ml-0">
-            {user.name.charAt(0)}
-          </span>
+          <Avatar key={user.name} name={user.name} size="sm" className="-ml-2 ring-2 ring-secondary first:ml-0" />
         ))}
       </span>
       <Icon aria-hidden className="size-4 shrink-0 text-primary" />

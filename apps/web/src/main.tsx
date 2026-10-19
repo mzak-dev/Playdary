@@ -3,10 +3,13 @@ import { RouterProvider, createRouter } from "@tanstack/react-router";
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import "./index.css";
+import { applyStoredTheme } from "./lib/theme";
 import { routeTree } from "./routeTree.gen";
 
 const router = createRouter({ routeTree, basepath: import.meta.env.BASE_URL });
 const queryClient = new QueryClient();
+
+applyStoredTheme();
 
 declare module "@tanstack/react-router" {
   interface Register {
