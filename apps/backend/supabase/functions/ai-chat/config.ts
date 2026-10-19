@@ -22,7 +22,7 @@ export const MAX_MESSAGES = 20;
 export const MAX_MESSAGE_LENGTH = 2000;
 export const MAX_TOOL_RESULT_LENGTH = 6000;
 export const MAX_CARDS = 6;
-export const PROVIDER_TIMEOUT_MS = 40_000;
+export const PROVIDER_TIMEOUT_MS = 90_000;
 export const DEFAULT_DAILY_LIMIT = 30;
 
 export const TOOLS = [
