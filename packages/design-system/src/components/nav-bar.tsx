@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import logo from "../assets/logo.png";
 import { cn } from "../lib/cn";
 import type { Game } from "../types";
+import { Avatar } from "./avatar";
 import { GameCover } from "./game-cover";
 import { Skeleton } from "./skeleton";
 import { Switch } from "./switch";
@@ -20,6 +21,7 @@ type NavBarProps = {
   searching: boolean;
   serverEmbeddings: boolean;
   onServerEmbeddingsChange: (enabled: boolean) => void;
+  onOpenProfile: () => void;
   onSignOut: () => void;
 };
 
@@ -38,14 +40,14 @@ function useHiddenOnScrollDown() {
   return hidden;
 }
 
-export function NavBar({ user, links, active, onNavigate, suggestions, searching, onSearch, onPick, serverEmbeddings, onServerEmbeddingsChange, onSignOut }: NavBarProps) {
+export function NavBar({ user, links, active, onNavigate, suggestions, searching, onSearch, onPick, serverEmbeddings, onServerEmbeddingsChange, onOpenProfile, onSignOut }: NavBarProps) {
   const [menuOpen, setMenuOpen] = useState(false);
   const menu = useRef<HTMLDivElement>(null);
   const [searchOpen, setSearchOpen] = useState(false);
   const [query, setQuery] = useState("");
   const input = useRef<HTMLInputElement>(null);
   const hidden = useHiddenOnScrollDown() && !searchOpen;
-  const activeIndex = Math.max(0, links.findIndex((link) => link.id === active));
+  const activeIndex = links.findIndex((link) => link.id === active);
 
   useEffect(() => {
     if (searchOpen) input.current?.focus();
@@ -81,8 +83,8 @@ export function NavBar({ user, links, active, onNavigate, suggestions, searching
         <div className={cn("relative grid overflow-hidden rounded-full transition-[width,opacity] duration-[400ms]", searchOpen ? "invisible w-0 opacity-0" : "w-[150px] sm:w-60")} style={{ gridTemplateColumns: `repeat(${links.length}, 1fr)` }}>
           <span
             aria-hidden
-            className="absolute inset-y-0 left-0 rounded-full bg-accent transition-transform duration-[450ms] ease-[cubic-bezier(0.3,1.25,0.5,1)]"
-            style={{ width: `${100 / links.length}%`, transform: `translateX(${activeIndex * 100}%)` }}
+            className={cn("absolute inset-y-0 left-0 rounded-full bg-accent transition-transform duration-[450ms] ease-[cubic-bezier(0.3,1.25,0.5,1)]", activeIndex < 0 && "invisible")}
+            style={{ width: `${100 / links.length}%`, transform: `translateX(${Math.max(0, activeIndex) * 100}%)` }}
           />
           {links.map((link) => (
             <button
@@ -174,9 +176,9 @@ export function NavBar({ user, links, active, onNavigate, suggestions, searching
             aria-haspopup="menu"
             aria-expanded={menuOpen}
             onClick={() => setMenuOpen(!menuOpen)}
-            className="grid size-10 place-items-center rounded-full bg-accent text-sm font-bold text-accent-foreground uppercase"
+            className="rounded-full"
           >
-            {user.charAt(0)}
+            <Avatar name={user} />
           </button>
           {menuOpen && (
             <div role="menu" className="absolute top-[calc(100%+16px)] right-0 min-w-48 rounded-md bg-popover p-1.5 text-popover-foreground shadow-pop ring-1 ring-border">
@@ -185,6 +187,9 @@ export function NavBar({ user, links, active, onNavigate, suggestions, searching
                 <span className="text-sm font-medium">Wyszukiwanie na serwerze</span>
                 <Switch label="Wyszukiwanie na serwerze" checked={serverEmbeddings} onChange={onServerEmbeddingsChange} />
               </div>
+              <button type="button" role="menuitem" onClick={() => { setMenuOpen(false); onOpenProfile(); }} className="w-full rounded-[10px] px-3 py-2.5 text-left text-sm font-medium hover:bg-accent focus-visible:bg-accent">
+                Profil
+              </button>
               <button type="button" role="menuitem" onClick={onSignOut} className="w-full rounded-[10px] px-3 py-2.5 text-left text-sm font-medium hover:bg-accent focus-visible:bg-accent">
                 Wyloguj się
               </button>
