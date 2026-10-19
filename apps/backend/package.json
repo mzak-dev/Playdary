@@ -9,7 +9,8 @@
     "db:reset": "supabase db reset",
     "db:new": "supabase migration new",
     "seed": "tsx --env-file=.env scripts/seed-igdb.ts",
-    "typecheck": "tsc"
+    "typecheck": "tsc",
+    "test": "tsx --test tests/*.test.ts"
   },
   "dependencies": {
     "@huggingface/transformers": "^4.3.1",

@@ -1,4 +1,5 @@
 export { cn } from "./lib/cn";
+export { igdbImage } from "./lib/igdb-image";
 export type { Friend, Game, GameList } from "./types";
 export { Button, type ButtonProps } from "./components/button";
 export { ScoreBadge } from "./components/score-badge";

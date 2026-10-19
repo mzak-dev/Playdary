@@ -1,5 +1,16 @@
 {
   "extends": "../../tsconfig.base.json",
-  "compilerOptions": { "types": ["node"], "module": "ESNext", "target": "ES2022" },
-  "include": ["scripts"]
+  "compilerOptions": {
+    "types": [
+      "node"
+    ],
+    "module": "ESNext",
+    "target": "ES2022",
+    "allowImportingTsExtensions": true
+  },
+  "include": [
+    "scripts",
+    "tests",
+    "supabase/functions/ai-chat/router.ts"
+  ]
 }
