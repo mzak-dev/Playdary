@@ -1,6 +1,7 @@
 import type { Friend, Game } from "@playdary/design-system";
 import { keepPreviousData, useInfiniteQuery, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { embedText } from "./embed";
+import { useServerEmbeddings } from "./embed-settings";
 import { toRpcParams, type Filters } from "./filters";
 import { polishTags } from "./labels";
 import { supabase } from "./supabase";
@@ -204,14 +205,16 @@ export const useSimilar = (gameId: number) =>
     },
   });
 
-const useQueryEmbedding = (query: string) =>
-  useQuery({
-    queryKey: ["embedding", query],
+const useQueryEmbedding = (query: string) => {
+  const [serverEmbeddings] = useServerEmbeddings();
+  return useQuery({
+    queryKey: ["embedding", query, serverEmbeddings],
     enabled: query.length > 1,
     staleTime: Infinity,
     retry: false,
     queryFn: () => embedText(query),
   });
+};
 
 export const useSearch = (query: string) => {
   const embedding = useQueryEmbedding(query).data ?? null;

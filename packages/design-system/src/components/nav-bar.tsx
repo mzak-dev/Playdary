@@ -5,6 +5,7 @@ import { cn } from "../lib/cn";
 import type { Game } from "../types";
 import { GameCover } from "./game-cover";
 import { Skeleton } from "./skeleton";
+import { Switch } from "./switch";
 
 type NavLink = { id: string; label: string; short: string };
 
@@ -17,6 +18,8 @@ type NavBarProps = {
   onSearch: (query: string) => void;
   onPick: (id: number) => void;
   searching: boolean;
+  serverEmbeddings: boolean;
+  onServerEmbeddingsChange: (enabled: boolean) => void;
   onSignOut: () => void;
 };
 
@@ -35,7 +38,7 @@ function useHiddenOnScrollDown() {
   return hidden;
 }
 
-export function NavBar({ user, links, active, onNavigate, suggestions, searching, onSearch, onPick, onSignOut }: NavBarProps) {
+export function NavBar({ user, links, active, onNavigate, suggestions, searching, onSearch, onPick, serverEmbeddings, onServerEmbeddingsChange, onSignOut }: NavBarProps) {
   const [menuOpen, setMenuOpen] = useState(false);
   const menu = useRef<HTMLDivElement>(null);
   const [searchOpen, setSearchOpen] = useState(false);
@@ -173,6 +176,10 @@ export function NavBar({ user, links, active, onNavigate, suggestions, searching
           {menuOpen && (
             <div role="menu" className="absolute top-[calc(100%+16px)] right-0 min-w-48 rounded-md bg-popover p-1.5 text-popover-foreground shadow-pop ring-1 ring-border">
               <p className="px-3 pt-2 pb-1 text-[13px] leading-[18px] text-muted-foreground">Zalogowano jako {user}</p>
+              <div className="flex items-center justify-between gap-4 px-3 py-2.5">
+                <span className="text-sm font-medium">Wyszukiwanie na serwerze</span>
+                <Switch label="Wyszukiwanie na serwerze" checked={serverEmbeddings} onChange={onServerEmbeddingsChange} />
+              </div>
               <button type="button" role="menuitem" onClick={onSignOut} className="w-full rounded-[10px] px-3 py-2.5 text-left text-sm font-medium hover:bg-accent focus-visible:bg-accent">
                 Wyloguj się
               </button>
