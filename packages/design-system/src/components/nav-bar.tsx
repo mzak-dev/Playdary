@@ -8,7 +8,7 @@ import { GameCover } from "./game-cover";
 import { Skeleton } from "./skeleton";
 import { Switch } from "./switch";
 
-type NavLink = { id: string; label: string; short: string };
+type NavLink = { id: string; label: string; short: string; badge?: number };
 
 type NavBarProps = {
   user: string;
@@ -96,6 +96,7 @@ export function NavBar({ user, links, active, onNavigate, suggestions, searching
             >
               <span className="hidden sm:inline">{link.label}</span>
               <span className="sm:hidden">{link.short}</span>
+              {link.badge ? <span aria-label={`${link.badge} nowych`} className="ml-1.5 inline-grid min-w-5 place-items-center rounded-full bg-primary px-1.5 text-[11px] leading-5 font-bold text-primary-foreground">{link.badge}</span> : null}
             </button>
           ))}
         </div>
