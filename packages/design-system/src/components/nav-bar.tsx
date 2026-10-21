@@ -80,7 +80,7 @@ export function NavBar({ user, links, active, onNavigate, suggestions, searching
           <span aria-hidden className="hidden sm:inline">Playdary</span>
         </div>
 
-        <div className={cn("relative grid overflow-hidden rounded-full transition-[width,opacity] duration-[400ms]", searchOpen ? "invisible w-0 opacity-0" : "w-[150px] sm:w-60")} style={{ gridTemplateColumns: `repeat(${links.length}, 1fr)` }}>
+        <div className={cn("relative grid overflow-hidden rounded-full transition-[width,opacity] duration-[400ms]", searchOpen ? "invisible w-0 opacity-0" : "w-[204px] sm:w-[330px]")} style={{ gridTemplateColumns: `repeat(${links.length}, 1fr)` }}>
           <span
             aria-hidden
             className={cn("absolute inset-y-0 left-0 rounded-full bg-accent transition-transform duration-[450ms] ease-[cubic-bezier(0.3,1.25,0.5,1)]", activeIndex < 0 && "invisible")}
@@ -92,7 +92,7 @@ export function NavBar({ user, links, active, onNavigate, suggestions, searching
               type="button"
               aria-current={link.id === active ? "page" : undefined}
               onClick={() => onNavigate(link.id)}
-              className={cn("relative z-[1] h-10 px-3 text-sm font-semibold whitespace-nowrap transition-colors hover:text-foreground", link.id === active ? "text-foreground" : "text-muted-foreground")}
+              className={cn("relative z-[1] h-10 px-1.5 text-[13px] sm:px-3 sm:text-sm font-semibold whitespace-nowrap transition-colors hover:text-foreground", link.id === active ? "text-foreground" : "text-muted-foreground")}
             >
               <span className="hidden sm:inline">{link.label}</span>
               <span className="sm:hidden">{link.short}</span>
@@ -166,7 +166,7 @@ export function NavBar({ user, links, active, onNavigate, suggestions, searching
           )}
         </div>
 
-        <button type="button" aria-label="Powiadomienia (nowe)" className="relative grid size-10 place-items-center rounded-full hover:bg-accent">
+        <button type="button" aria-label="Powiadomienia (nowe)" className="relative hidden size-10 place-items-center rounded-full hover:bg-accent sm:grid">
           <Bell aria-hidden className="size-5" />
           <span className="absolute top-[7px] right-[7px] size-2.5 rounded-full bg-primary ring-2 ring-secondary" />
         </button>
