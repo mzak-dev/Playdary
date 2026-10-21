@@ -1,5 +1,5 @@
 import { animate, stagger } from "animejs";
-import { ChevronRight } from "lucide-react";
+import { Shuffle } from "lucide-react";
 import { Fragment, useEffect, useRef, useState, type ReactNode } from "react";
 import { Button } from "./button";
 import { PageHero } from "./page-hero";
@@ -17,6 +17,7 @@ export function QuoteHero({ user, quotes, interval = 9000, onOpenGame, children 
   const quote = quotes[index % quotes.length];
   const reduced = prefersReducedMotion();
   const showNext = () => setIndex((n) => (n + 1) % quotes.length);
+  const showRandom = () => setIndex((n) => (n + 1 + Math.floor(Math.random() * (quotes.length - 1))) % quotes.length);
 
   useEffect(() => {
     if (paused || reduced || quotes.length < 2) return;
@@ -75,8 +76,8 @@ export function QuoteHero({ user, quotes, interval = 9000, onOpenGame, children 
             Zobacz grę
           </Button>
           {quotes.length > 1 && (
-            <Button variant="ghost" size="sm" aria-label="Następny cytat" title="Następny cytat" onClick={showNext} className="size-8 px-0 text-muted-foreground opacity-40 hover:opacity-100 focus-visible:opacity-100">
-              <ChevronRight size={18} aria-hidden />
+            <Button variant="ghost" size="sm" aria-label="Losuj cytat" title="Losuj cytat" onClick={showRandom} className="size-8 px-0 text-muted-foreground opacity-40 hover:opacity-100 focus-visible:opacity-100">
+              <Shuffle size={16} aria-hidden />
             </Button>
           )}
         </div>
