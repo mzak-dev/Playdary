@@ -9,8 +9,9 @@ import { requireSession } from "../lib/auth";
 import { DEFAULT_FILTERS, TABS, activeFilterCount, type Filters, type TabLabel } from "../lib/filters";
 import { useBrowse, useFollows, useFriends, useTicker, useToggleFollow, useTopUpcoming } from "../lib/games";
 import { useSetList, useUserLists } from "../lib/library";
+import { usePolishQuotes } from "../lib/polish-quotes-setting";
 import { useUsername } from "../lib/profile";
-import { quotes } from "../quotes";
+import { polishQuotes, quotes } from "../quotes";
 
 export const Route = createFileRoute("/")({
   beforeLoad: async () => ({ session: await requireSession() }),
@@ -27,6 +28,8 @@ function Home() {
   const navigate = useNavigate();
   const userId = session.user.id;
   const user = useUsername(session);
+  const [polishEnabled] = usePolishQuotes();
+  const heroQuotes = useMemo(() => (polishEnabled ? [...quotes, ...polishQuotes] : quotes), [polishEnabled]);
 
   const [filters, setFilters] = useState<Filters>(DEFAULT_FILTERS);
   const [filtersOpen, setFiltersOpen] = useState(false);
@@ -63,7 +66,7 @@ function Home() {
 
   return (
     <AppShell session={session}>
-      <QuoteHero user={user} quotes={quotes}>
+      <QuoteHero user={user} quotes={heroQuotes}>
         {ticker.data ? (
           ticker.data.length > 0 && <ReleaseTicker games={ticker.data} onOpen={open} />
         ) : (

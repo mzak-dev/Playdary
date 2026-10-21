@@ -19,7 +19,6 @@ export const quotes: Quote[] = [
   { text: "Hey, you. You're finally awake.", game: "The Elder Scrolls V: Skyrim", year: 2011 },
   { text: "Fus Ro Dah!", game: "The Elder Scrolls V: Skyrim", year: 2011 },
   { text: "Wake up, Samurai.", game: "Cyberpunk 2077", year: 2020 },
-  { text: "Wstawaj, samuraju. Mamy miasto do spalenia.", game: "Cyberpunk 2077", year: 2020 },
   { text: "Go for the eyes, Boo! Go for the eyes!", game: "Baldur's Gate II", year: 2000 },
   { text: "You must construct additional pylons.", game: "StarCraft", year: 1998 },
   { text: "Nuclear launch detected.", game: "StarCraft", year: 1998 },
@@ -28,4 +27,12 @@ export const quotes: Quote[] = [
   { text: "You must defeat Sheng Long to stand a chance.", game: "Street Fighter II", year: 1991 },
   { text: "It's time to kick ass and chew bubblegum.", game: "Duke Nukem 3D", year: 1996 },
   { text: "It's super effective!", game: "Pokémon Red and Blue", year: 1996 },
+];
+
+export const polishQuotes: Quote[] = [
+  { text: "Zaraza!", game: "Wiedźmin 3: Dziki Gon", year: 2015 },
+  { text: "Ależ wieje.", game: "Wiedźmin 3: Dziki Gon", year: 2015 },
+  { text: "Lambert, Lambert, ty chuju", game: "Wiedźmin 3: Dziki Gon", year: 2015 },
+  { text: "Przed wyruszeniem w drogę należy zebrać drużynę.", game: "Baldur's Gate", year: 1998 },
+  { text: "Wstawaj, samuraju. Mamy miasto do spalenia.", game: "Cyberpunk 2077", year: 2020 },
 ];
