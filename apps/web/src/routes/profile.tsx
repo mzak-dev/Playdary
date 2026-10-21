@@ -1,22 +1,21 @@
 import { Avatar, Button, GameRow, PageHero, Rating, SegmentedControl, Skeleton, Switch, TextField } from "@playdary/design-system";
 import type { Session } from "@supabase/supabase-js";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useState, type FormEvent, type ReactNode } from "react";
+import { useState, type FormEvent } from "react";
 import { AppShell } from "../components/app-shell";
+import { Panel, SectionHeading } from "../components/panel";
 import { requireSession } from "../lib/auth";
-import { useMyFriends, useProfile, useProfileStats, useRatedGames, useUpdateProfile, type Notifications, type Privacy } from "../lib/profile";
+import { PRIVACY, PRIVACY_LABELS, useMyFriends, useProfile, useProfileStats, useRatedGames, useUpdateProfile, type Notifications } from "../lib/profile";
 import { supabase } from "../lib/supabase";
 import { THEMES, setTheme, useTheme } from "../lib/theme";
 
-export const Route = createFileRoute("/profile")({
-  beforeLoad: async () => ({ session: await requireSession() }),
-  component: ProfilePage,
-});
-
 const SECTIONS = ["Przegląd", "Ustawienia"] as const;
 
-const PRIVACY: Record<string, Privacy> = { Wszyscy: "everyone", Znajomi: "friends", "Tylko ja": "private" };
-const PRIVACY_LABELS = Object.keys(PRIVACY);
+export const Route = createFileRoute("/profile")({
+  beforeLoad: async () => ({ session: await requireSession() }),
+  validateSearch: (search: Record<string, unknown>): { section?: (typeof SECTIONS)[number] } => ({ section: SECTIONS.find((section) => section === search.section) }),
+  component: ProfilePage,
+});
 
 const NOTIFICATION_ROWS: { key: keyof Notifications; label: string; description: string }[] = [
   { key: "friends", label: "Aktywność znajomych", description: "Gdy znajomy obserwuje lub ocenia grę z Twoich list." },
@@ -30,23 +29,12 @@ const saveErrorText = (error: { code?: string; message: string }) => {
   return error.message;
 };
 
-function Panel({ title, children }: { title: string; children: ReactNode }) {
-  return (
-    <section className="flex flex-col gap-5 rounded-lg bg-secondary p-6">
-      <h2 className="font-display text-xl leading-[26px] font-bold">{title}</h2>
-      {children}
-    </section>
-  );
-}
-
-const SectionHeading = ({ children }: { children: ReactNode }) => <h2 className="font-display text-[28px] leading-[34px] font-bold tracking-tight">{children}</h2>;
-
 function ProfilePage() {
   const { session } = Route.useRouteContext();
   const userId = session.user.id;
   const profile = useProfile(userId);
   const stats = useProfileStats(userId);
-  const [section, setSection] = useState<(typeof SECTIONS)[number]>("Przegląd");
+  const [section, setSection] = useState<(typeof SECTIONS)[number]>(Route.useSearch().section ?? "Przegląd");
   const username = profile.data?.username ?? session.user.email?.split("@")[0] ?? "";
 
   const statItems = [
@@ -121,7 +109,12 @@ function Overview({ userId }: { userId: string }) {
       </section>
 
       <section className="flex flex-col gap-4">
-        <SectionHeading>Znajomi</SectionHeading>
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <SectionHeading>Znajomi</SectionHeading>
+          <Button variant="secondary" size="sm" onClick={() => navigate({ to: "/friends", search: { tab: "Znajomi" } })}>
+            Zobacz wszystkich
+          </Button>
+        </div>
         {friends.error && <p role="alert" className="text-sm font-medium text-destructive">Nie udało się wczytać znajomych: {friends.error.message}</p>}
         {friends.data?.length === 0 && <p className="text-muted-foreground">Nie masz jeszcze znajomych.</p>}
         <ul className="flex flex-wrap gap-3">

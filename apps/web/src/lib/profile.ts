@@ -6,6 +6,9 @@ import { supabase } from "./supabase";
 
 export type Privacy = "everyone" | "friends" | "private";
 export type Notifications = { friends: boolean; release: boolean; digest: boolean };
+export const PRIVACY: Record<string, Privacy> = { Wszyscy: "everyone", Znajomi: "friends", "Tylko ja": "private" };
+export const PRIVACY_LABELS = Object.keys(PRIVACY);
+
 export type Profile = { username: string; privacy: Privacy; notifications: Notifications };
 
 const profileKey = (userId: string) => ["profile", userId];
