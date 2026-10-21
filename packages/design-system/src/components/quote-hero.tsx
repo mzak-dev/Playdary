@@ -57,7 +57,7 @@ export function QuoteHero({ user, quotes, interval = 9000, onOpenGame, children 
             {user}
           </strong>
         </span>
-        <h1 key={index} ref={quoteRef} aria-label={quote.text} className="max-w-[15ch] font-display text-[clamp(36px,9vw,56px)] leading-[1.04] font-extrabold tracking-tight">
+        <h1 key={index} ref={quoteRef} aria-label={quote.text} className="max-w-[45ch] font-display text-[clamp(36px,9vw,56px)] leading-[1.04] font-extrabold tracking-tight">
           {quote.text.split(" ").map((word, i) => (
             <Fragment key={i}>
               {i > 0 && " "}
