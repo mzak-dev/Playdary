@@ -19,6 +19,7 @@ export const quotes: Quote[] = [
   { text: "Hey, you. You're finally awake.", game: "The Elder Scrolls V: Skyrim", year: 2011 },
   { text: "Fus Ro Dah!", game: "The Elder Scrolls V: Skyrim", year: 2011 },
   { text: "Wake up, Samurai.", game: "Cyberpunk 2077", year: 2020 },
+  { text: "Wstawaj, samuraju. Mamy miasto do spalenia.", game: "Cyberpunk 2077", year: 2020 },
   { text: "Go for the eyes, Boo! Go for the eyes!", game: "Baldur's Gate II", year: 2000 },
   { text: "You must construct additional pylons.", game: "StarCraft", year: 1998 },
   { text: "Nuclear launch detected.", game: "StarCraft", year: 1998 },
