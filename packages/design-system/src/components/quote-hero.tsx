@@ -1,4 +1,5 @@
 import { animate, stagger } from "animejs";
+import { ChevronRight } from "lucide-react";
 import { Fragment, useEffect, useRef, useState, type ReactNode } from "react";
 import { Button } from "./button";
 import { PageHero } from "./page-hero";
@@ -15,12 +16,13 @@ export function QuoteHero({ user, quotes, interval = 9000, onOpenGame, children 
   const quoteRef = useRef<HTMLHeadingElement>(null);
   const quote = quotes[index % quotes.length];
   const reduced = prefersReducedMotion();
+  const showNext = () => setIndex((n) => (n + 1) % quotes.length);
 
   useEffect(() => {
     if (paused || reduced || quotes.length < 2) return;
-    const id = setInterval(() => setIndex((n) => (n + 1) % quotes.length), interval);
+    const id = setInterval(showNext, interval);
     return () => clearInterval(id);
-  }, [paused, reduced, quotes.length, interval]);
+  }, [paused, reduced, quotes.length, interval, index]);
 
   useEffect(() => {
     if (reduced || !quoteRef.current) return;
@@ -72,6 +74,11 @@ export function QuoteHero({ user, quotes, interval = 9000, onOpenGame, children 
           <Button variant="secondary" onClick={onOpenGame}>
             Zobacz grę
           </Button>
+          {quotes.length > 1 && (
+            <Button variant="ghost" size="sm" aria-label="Następny cytat" title="Następny cytat" onClick={showNext} className="size-8 px-0 text-muted-foreground opacity-40 hover:opacity-100 focus-visible:opacity-100">
+              <ChevronRight size={18} aria-hidden />
+            </Button>
+          )}
         </div>
         {children && <div className="mt-4 -mx-4 sm:-mx-8">{children}</div>}
       </>
