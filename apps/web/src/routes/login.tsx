@@ -42,6 +42,15 @@ function Login() {
     setNotice("Sprawdź skrzynkę i potwierdź adres e-mail, a potem się zaloguj.");
   };
 
+  const signInWith = async (provider: "google" | "discord") => {
+    setError(null);
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider,
+      options: { redirectTo: `${window.location.origin}${import.meta.env.BASE_URL}` },
+    });
+    if (error) setError(error.message);
+  };
+
   return (
     <main className="grid min-h-screen place-items-center px-4">
       <form onSubmit={submit} className="flex w-full max-w-md flex-col gap-5 rounded-lg bg-card p-8">
@@ -65,6 +74,10 @@ function Login() {
         <Button type="submit" size="lg" disabled={busy}>
           {signingUp ? "Załóż konto" : "Zaloguj się"}
         </Button>
+        <div className="flex gap-3">
+          <Button type="button" variant="outline" className="flex-1" onClick={() => signInWith("google")}>Google</Button>
+          <Button type="button" variant="outline" className="flex-1" onClick={() => signInWith("discord")}>Discord</Button>
+        </div>
       </form>
     </main>
   );
