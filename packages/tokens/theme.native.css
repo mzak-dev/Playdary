@@ -98,5 +98,10 @@
   --radius-xl: 40px;
   --shadow-pop: var(--pop-shadow);
   --font-display: Sora_700Bold;
+  --font-display-semibold: Sora_600SemiBold;
+  --font-display-extrabold: Sora_800ExtraBold;
   --font-sans: DMSans_400Regular;
+  --font-sans-medium: DMSans_500Medium;
+  --font-sans-semibold: DMSans_600SemiBold;
+  --font-sans-bold: DMSans_700Bold;
 }

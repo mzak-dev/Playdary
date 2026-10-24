@@ -68,5 +68,13 @@ export const radii = { sm: "8px", md: "14px", lg: "28px", xl: "40px" } as const;
 
 export const fonts = {
   web: { display: '"Sora Variable", system-ui, sans-serif', sans: '"DM Sans Variable", system-ui, sans-serif' },
-  native: { display: "Sora_700Bold", sans: "DMSans_400Regular" },
+  native: {
+    display: "Sora_700Bold",
+    "display-semibold": "Sora_600SemiBold",
+    "display-extrabold": "Sora_800ExtraBold",
+    sans: "DMSans_400Regular",
+    "sans-medium": "DMSans_500Medium",
+    "sans-semibold": "DMSans_600SemiBold",
+    "sans-bold": "DMSans_700Bold",
+  },
 } as const;
