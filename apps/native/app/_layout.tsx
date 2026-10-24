@@ -46,6 +46,7 @@ function Navigator() {
         <Stack.Protected guard={Boolean(session)}>
           <Stack.Screen name="(tabs)" />
           <Stack.Screen name="games/[gameId]" />
+          <Stack.Screen name="u/[username]" />
         </Stack.Protected>
         <Stack.Protected guard={!session && !onboarded}>
           <Stack.Screen name="onboarding" />

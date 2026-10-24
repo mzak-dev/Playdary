@@ -14,6 +14,7 @@ type FilterSheetProps<T extends Common> = {
   onReset: () => void;
   sorts: readonly { label: string; value: string }[];
   summary?: string;
+  facets?: { platforms: { label: string; count: number }[]; genres: { label: string; count: number }[] };
 };
 
 const toggle = (list: string[], item: string) => (list.includes(item) ? list.filter((x) => x !== item) : [...list, item]);
@@ -25,7 +26,7 @@ const Row = ({ label, children }: { label: string; children: ReactNode }) => (
   </View>
 );
 
-export function FilterSheet<T extends Common>({ visible, onClose, filters, onChange, onReset, sorts, summary }: FilterSheetProps<T>) {
+export function FilterSheet<T extends Common>({ visible, onClose, filters, onChange, onReset, sorts, summary, facets }: FilterSheetProps<T>) {
   const insets = useSafeAreaInsets();
   const set = (patch: Partial<T>) => onChange({ ...filters, ...patch });
 
@@ -45,7 +46,7 @@ export function FilterSheet<T extends Common>({ visible, onClose, filters, onCha
             <Row label="Platforma">
               <View className="flex-row flex-wrap gap-2">
                 {PLATFORMS.map((p) => (
-                  <Chip key={p.label} pressed={filters.platforms.includes(p.label)} onPress={() => set({ platforms: toggle(filters.platforms, p.label) } as Partial<T>)}>
+                  <Chip key={p.label} pressed={filters.platforms.includes(p.label)} count={facets?.platforms.find((f) => f.label === p.label)?.count} onPress={() => set({ platforms: toggle(filters.platforms, p.label) } as Partial<T>)}>
                     {p.label}
                   </Chip>
                 ))}
@@ -54,7 +55,7 @@ export function FilterSheet<T extends Common>({ visible, onClose, filters, onCha
             <Row label="Gatunek">
               <View className="flex-row flex-wrap gap-2">
                 {GENRES.map((g) => (
-                  <Chip key={g.label} pressed={filters.genres.includes(g.label)} onPress={() => set({ genres: toggle(filters.genres, g.label) } as Partial<T>)}>
+                  <Chip key={g.label} pressed={filters.genres.includes(g.label)} count={facets?.genres.find((f) => f.label === g.label)?.count} onPress={() => set({ genres: toggle(filters.genres, g.label) } as Partial<T>)}>
                     {g.label}
                   </Chip>
                 ))}
