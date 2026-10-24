@@ -1,7 +1,8 @@
 import { cva, type VariantProps } from "class-variance-authority";
-import { Children, type ReactNode } from "react";
-import { Pressable, Text, type PressableProps } from "react-native";
+import type { ReactNode } from "react";
+import { Pressable, type PressableProps } from "react-native";
 import { cn } from "../lib/cn";
+import { wrapText } from "../lib/text-children";
 
 const buttonVariants = cva("flex-row items-center justify-center gap-2 rounded-full active:opacity-80 disabled:opacity-45", {
   variants: {
@@ -41,7 +42,7 @@ export function Button({ variant, size, className, children, ...props }: ButtonP
   const label = labelVariants({ variant, size });
   return (
     <Pressable accessibilityRole="button" className={cn(buttonVariants({ variant, size }), className)} {...props}>
-      {Children.map(children, (child) => (typeof child === "string" || typeof child === "number" ? <Text className={label}>{child}</Text> : child))}
+      {wrapText(children, label)}
     </Pressable>
   );
 }
