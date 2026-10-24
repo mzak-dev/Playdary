@@ -8,6 +8,7 @@ import { requireSession } from "../lib/auth";
 import { GENRES, PERIODS, PLATFORMS, SCORES } from "../lib/filters";
 import { gamesCount } from "../lib/format";
 import { useFollows, useFriends, useSearchResults, useToggleFollow } from "../lib/games";
+import { useOverlayCards } from "../lib/overlay-cards-setting";
 import { useSetList, useUserLists } from "../lib/library";
 import { DEFAULT_SEARCH_FILTERS, SEARCH_SORTS, facetCounts, filterGames, searchFilterCount, type SearchFilters } from "../lib/search-filters";
 
@@ -30,6 +31,7 @@ function SearchPage() {
   const toggleFollow = useToggleFollow(userId);
   const lists = useUserLists(userId);
   const setList = useSetList(userId);
+  const [overlay] = useOverlayCards();
   const [draft, setDraft] = useState(q);
   const [filters, setFilters] = useState<SearchFilters>(DEFAULT_SEARCH_FILTERS);
   const [sheetOpen, setSheetOpen] = useState(false);
@@ -174,10 +176,11 @@ function SearchPage() {
               />
             )}
             <div aria-busy={results.isFetching} className={`grid grid-cols-[repeat(auto-fill,minmax(270px,1fr))] gap-6 transition-opacity ${results.isPlaceholderData ? "opacity-60" : ""}`}>
-              {query.length > 1 && results.isPending && Array.from({ length: 6 }, (_, i) => <GameCardSkeleton key={i} />)}
+              {query.length > 1 && results.isPending && Array.from({ length: 6 }, (_, i) => <GameCardSkeleton key={i} overlay={overlay} />)}
               {visible.map((game, i) => (
                 <Reveal key={game.id} index={i % 6} className="flex">
                 <GameCard
+                  overlay={overlay}
                   game={game}
                   friend={friends?.[game.id]}
                   following={follows.data?.has(game.id) ?? false}

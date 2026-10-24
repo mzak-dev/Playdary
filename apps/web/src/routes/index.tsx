@@ -10,6 +10,7 @@ import { gamesCount } from "../lib/format";
 import { DEFAULT_FILTERS, GENRES, TABS, activeFilterCount, type Filters, type TabLabel } from "../lib/filters";
 import { useBrowse, useFollows, useFriends, useShelf, useTicker, useToggleFollow, useTopUpcoming } from "../lib/games";
 import { useSetList, useUserLists } from "../lib/library";
+import { useOverlayCards } from "../lib/overlay-cards-setting";
 import { usePolishQuotes } from "../lib/polish-quotes-setting";
 import { useUsername } from "../lib/profile";
 import { polishQuotes, quotes } from "../quotes";
@@ -29,7 +30,7 @@ const SHELVES = [
 const monthLabel = (releaseDate: number | null) =>
   releaseDate ? new Date(releaseDate).toLocaleDateString("pl-PL", { month: "long", ...(new Date(releaseDate).getFullYear() !== new Date().getFullYear() && { year: "numeric" }) }) : "TBA";
 
-const skeletons = (count: number, className?: string) => Array.from({ length: count }, (_, i) => <GameCardSkeleton key={i} className={className} />);
+
 
 function Home() {
   const { session } = Route.useRouteContext();
@@ -37,6 +38,7 @@ function Home() {
   const userId = session.user.id;
   const user = useUsername(session);
   const [polishEnabled] = usePolishQuotes();
+  const [overlay] = useOverlayCards();
   const heroQuotes = useMemo(() => (polishEnabled ? [...quotes, ...polishQuotes] : quotes), [polishEnabled]);
 
   const [filters, setFilters] = useState<Filters>(DEFAULT_FILTERS);
@@ -67,6 +69,8 @@ function Home() {
 
   const open = (id: number) => navigate({ to: "/games/$gameId", params: { gameId: String(id) } });
 
+  const skeletons = (count: number, className?: string) => Array.from({ length: count }, (_, i) => <GameCardSkeleton key={i} className={className} overlay={overlay} />);
+
   const card = (game: Game, rank?: number, className?: string) => (
     <GameCard
       key={game.id}
@@ -78,6 +82,7 @@ function Home() {
       onFollow={(follow) => toggleFollow.mutate({ gameId: game.id, follow })}
       onListChange={(list) => setList.mutate({ gameId: game.id, list })}
       onOpen={() => open(game.id)}
+      overlay={overlay}
       className={className}
     />
   );

@@ -1,7 +1,9 @@
 import { cn } from "../lib/cn";
 import { Skeleton } from "./skeleton";
 
-export function GameCardSkeleton({ className }: { className?: string }) {
+export function GameCardSkeleton({ className, overlay = false }: { className?: string; overlay?: boolean }) {
+  if (overlay) return <Skeleton aria-hidden className={cn("aspect-[2/3] w-full rounded-lg", className)} />;
+
   return (
     <div aria-hidden className={cn("flex flex-col rounded-lg bg-card", className)}>
       <Skeleton className="aspect-[16/10] w-full rounded-none rounded-t-lg" />
