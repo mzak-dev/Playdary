@@ -23,7 +23,7 @@
 - `lightningcss` must be pinned to `1.30.1` as a direct dependency of `apps/native`. Newer versions fail in the `react-native-css` compiler with `failed to deserialize`. The pin is local to the app, so web keeps its own lightningcss.
 - `nativewind-env.d.ts` is created by hand (`expo start` normally writes it) and declares `*.css` for the `global.css` import.
 - `tsc` passes with the root TypeScript 7.
-- SDK 58 pins `react 19.3.0` and `react-native 0.88.0`; web uses `react ^19.3.1`. React Native needs the exact renderer match, so `apps/native` pins `react 19.3.0`. Shared packages must declare `react` as a peer dependency, and the repo moves to one React version when `packages/core` lands.
+- SDK 58 pins `react 19.3.0` and `react-native 0.88.0`, and React Native needs the exact renderer match. The whole repo therefore uses `react 19.3.0` (web was on 19.3.1) and shared packages declare `react` as a peer dependency.
 - Not verified in the build environment: running in Expo Go on a device. Do this first on a phone.
 
 ## Fonts
