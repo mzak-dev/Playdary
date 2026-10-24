@@ -6,7 +6,7 @@ const themeSetting = createSetting<Theme>({ storage: nativeStorage, key: "playda
 
 const polishQuotesSetting = flagSetting(nativeStorage, "playdary:polish-quotes");
 
-const applyTheme = (theme: Theme) => Appearance.setColorScheme(theme === "Jasny" ? "light" : "dark");
+const applyTheme = (theme: Theme) => Appearance.setColorScheme?.(theme === "Jasny" ? "light" : "dark");
 
 export const applyStoredTheme = () => applyTheme(themeSetting.get());
 
