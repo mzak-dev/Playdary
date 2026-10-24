@@ -1,7 +1,7 @@
 import type { KeyValueStorage } from "@playdary/core";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-const SETTING_KEYS = ["playdary:theme", "playdary:polish-quotes"];
+const SETTING_KEYS = ["playdary:theme", "playdary:polish-quotes", "playdary:onboarded"];
 
 const cache = new Map<string, string>();
 

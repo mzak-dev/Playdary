@@ -12,7 +12,7 @@ import { SafeAreaProvider } from "react-native-safe-area-context";
 import { isConfigured } from "../lib/env";
 import { CACHE_MAX_AGE, persister, queryClient } from "../lib/query";
 import { SessionProvider, useSession } from "../lib/session";
-import { applyStoredTheme, useTheme } from "../lib/settings";
+import { applyStoredTheme, useOnboarded, useTheme } from "../lib/settings";
 import { hydrateStorage } from "../lib/storage";
 import { supabase } from "../lib/supabase";
 
@@ -31,6 +31,7 @@ function MissingConfig() {
 function Navigator() {
   const session = useSession();
   const theme = useTheme();
+  const onboarded = useOnboarded();
 
   useEffect(() => {
     if (session !== undefined) void SplashScreen.hideAsync();
@@ -45,7 +46,10 @@ function Navigator() {
         <Stack.Protected guard={Boolean(session)}>
           <Stack.Screen name="(tabs)" />
         </Stack.Protected>
-        <Stack.Protected guard={!session}>
+        <Stack.Protected guard={!session && !onboarded}>
+          <Stack.Screen name="onboarding" />
+        </Stack.Protected>
+        <Stack.Protected guard={!session && onboarded}>
           <Stack.Screen name="(auth)/login" />
         </Stack.Protected>
       </Stack>

@@ -18,3 +18,9 @@ export const setTheme = (theme: Theme) => {
 export const useTheme = () => useSetting(themeSetting)[0];
 
 export const usePolishQuotes = () => useSetting(polishQuotesSetting);
+
+const onboardedSetting = flagSetting(nativeStorage, "playdary:onboarded");
+
+export const useOnboarded = () => useSetting(onboardedSetting)[0];
+
+export const finishOnboarding = () => onboardedSetting.set(true);
