@@ -47,6 +47,14 @@ React Native has no variable-weight fonts. Each weight is its own family (`Sora_
 - E-mail and password work in Expo Go. Google and Discord open the system browser and return through the redirect URL; test them in a dev client.
 - The session is stored in AsyncStorage and refreshed while the app is in the foreground. Sign-out clears the persisted query cache.
 
-## Visual check without a device
+## Browser preview
 
-Temporarily add `react-native-web` and `@expo/metro-runtime` to `apps/native`, set `expo.web.bundler` to `metro`, run `expo export --platform web` and open the result in a 390x844 browser. `Appearance.setColorScheme` does not exist there, so the theme switch needs the browser colour scheme emulated. Do not commit these changes.
+`pnpm --filter @playdary/native web` runs the app in a browser through `react-native-web`, with your `.env`. It checks layout, colours, fonts and flow, not React Native's own style engine, so confirm on a phone too. `Appearance.setColorScheme` is missing there, so the theme switch only works on a device.
+
+## Screens
+
+- Onboarding: five swipeable slides (search, rate, lists, friends, AI assistant), shown once; the flag lives in `playdary:onboarded`.
+- Tabs: Start, Szukaj, Listy, Znajomi, Profil. Outside the tabs: `games/[gameId]` and `u/[username]`.
+- Not built yet: the AI chat itself. Slide five only announces it.
+- Trailers use `react-native-youtube-iframe` on devices and a plain iframe in the browser preview.
+- Set `EXPO_PUBLIC_WEB_URL` to the web app address so invite links open there; without it they use the app's deep link.
