@@ -6,6 +6,7 @@ import { AppShell } from "../components/app-shell";
 import { FilterPanel } from "../components/filter-panel";
 import { GameEmptyState } from "../components/game-empty-state";
 import { requireSession } from "../lib/auth";
+import { gamesCount } from "../lib/format";
 import { DEFAULT_FILTERS, TABS, activeFilterCount, type Filters, type TabLabel } from "../lib/filters";
 import { useBrowse, useFollows, useFriends, useTicker, useToggleFollow, useTopUpcoming } from "../lib/games";
 import { useSetList, useUserLists } from "../lib/library";
@@ -20,8 +21,6 @@ export const Route = createFileRoute("/")({
 
 const TAB_LABELS = TABS.map((tab) => tab.label);
 const skeletons = (count: number, className?: string) => Array.from({ length: count }, (_, i) => <GameCardSkeleton key={i} className={className} />);
-
-const gamesCount = (n: number) => `${n.toLocaleString("pl-PL")} ${n === 1 ? "gra" : n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 12 || n % 100 > 14) ? "gry" : "gier"}`;
 
 function Home() {
   const { session } = Route.useRouteContext();

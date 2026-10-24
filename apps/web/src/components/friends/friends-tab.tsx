@@ -1,4 +1,4 @@
-import { ActivityItem, Avatar, Button, MatchMeter, Skeleton, StatTile, Switch, TextField } from "@playdary/design-system";
+import { ActivityItem, Avatar, Button, MatchMeter, MatchRing, Skeleton, StatTile, Switch, TextField } from "@playdary/design-system";
 import { useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { relativeTime, useFriendAction, useFriendCards, useFriendDetail, type FriendCard } from "../../lib/friends";
@@ -6,7 +6,6 @@ import { Panel } from "../panel";
 
 const sinceLabel = (since: number) => new Date(since).toLocaleDateString("pl-PL", { day: "numeric", month: "long", year: "numeric" });
 const statusLabel = (card: FriendCard) => (card.playing ? `Gra w ${card.playing.name}` : `Znajomi od ${sinceLabel(card.since)}`);
-const percent = (value: number | null) => (value === null ? "–" : `${Math.round(value * 100)}%`);
 
 export function FriendsTab({ userId }: { userId: string }) {
   const cards = useFriendCards();
@@ -37,12 +36,12 @@ export function FriendsTab({ userId }: { userId: string }) {
       )}
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
         {visible.map((card) => (
-          <button key={card.id} type="button" aria-label={`Profil znajomego: ${card.username}`} onClick={() => setSelectedId(card.id)} className="flex flex-col gap-4 rounded-lg bg-secondary p-5 text-left transition-colors hover:bg-accent">
+          <button key={card.id} type="button" aria-label={`Profil znajomego: ${card.username}`} onClick={() => setSelectedId(card.id)} className="flex flex-col gap-4 rounded-lg border border-transparent bg-secondary p-5 text-left transition duration-200 hover:-translate-y-[3px] hover:border-primary focus-visible:border-primary motion-reduce:transition-none">
             <span className="flex items-center gap-3.5">
               <Avatar name={card.username} status={card.playing ? "playing" : undefined} />
               <span className="flex min-w-0 flex-col">
                 <span className="truncate text-base leading-[22px] font-bold">{card.username}</span>
-                <span className="truncate text-[13px] leading-[18px] text-muted-foreground">{statusLabel(card)}</span>
+                <span className={`truncate text-[13px] leading-[18px] ${card.playing ? "font-medium text-success" : "text-muted-foreground"}`}>{statusLabel(card)}</span>
               </span>
             </span>
             <MatchMeter value={card.match} />
@@ -81,10 +80,12 @@ function FriendDetail({ userId, card, onBack }: DetailProps) {
           <span className="text-[15px] leading-[22px] font-medium">{statusLabel(card)}</span>
           <span className="text-[13px] leading-[18px] text-muted-foreground">Znajomi od {sinceLabel(card.since)}</span>
         </div>
+        <div className="sm:ml-auto">
+          <MatchRing value={card.match} />
+        </div>
       </div>
       {card.done === null && <p className="text-muted-foreground">{card.username} ukrywa swoje listy i oceny.</p>}
       <div className="flex flex-wrap gap-3">
-        <StatTile value={percent(card.match)} label="Zgodność gustu" />
         <StatTile value={String(card.done ?? "–")} label="Ukończone" />
         <StatTile value={String(card.rated ?? "–")} label="Ocenione" />
         <StatTile value={String(detail.data?.common.length ?? "–")} label="Wspólne gry" />

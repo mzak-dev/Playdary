@@ -1,9 +1,9 @@
 import { animate } from "animejs";
 import { useEffect, useRef } from "react";
 
-type CountUpProps = { to: number; duration?: number; className?: string };
+type CountUpProps = { to: number; duration?: number; decimals?: number; className?: string };
 
-export function CountUp({ to, duration = 900, className }: CountUpProps) {
+export function CountUp({ to, duration = 900, decimals = 0, className }: CountUpProps) {
   const ref = useRef<HTMLSpanElement>(null);
 
   useEffect(() => {
@@ -15,17 +15,17 @@ export function CountUp({ to, duration = 900, className }: CountUpProps) {
       duration,
       ease: "outExpo",
       onUpdate: () => {
-        element.textContent = String(Math.round(counter.value));
+        element.textContent = counter.value.toFixed(decimals);
       },
     });
     return () => {
       animation.cancel();
     };
-  }, [to, duration]);
+  }, [to, duration, decimals]);
 
   return (
     <span ref={ref} className={className}>
-      {to}
+      {to.toFixed(decimals)}
     </span>
   );
 }

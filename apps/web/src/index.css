@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@import "tw-animate-css";
 @import "@playdary/design-system/tokens.css";
 @source "../../../packages/design-system/src";
 

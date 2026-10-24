@@ -35,3 +35,8 @@ export { SelectField } from "./components/select-field";
 export { TextField } from "./components/text-field";
 export { NavBar } from "./components/nav-bar";
 export { Footer } from "./components/footer";
+export { StaggeredMenu, type StaggeredMenuLink } from "./components/staggered-menu";
+export { MatchRing } from "./components/match-ring";
+export { BlurText } from "./components/blur-text";
+export { Reveal } from "./components/reveal";
+export { Sheet, SheetContent, SheetDescription, SheetFooter, SheetHeader, SheetTitle, SheetTrigger, SheetClose } from "./components/ui/sheet";
