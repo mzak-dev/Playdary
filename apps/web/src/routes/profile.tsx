@@ -7,6 +7,7 @@ import { Panel } from "../components/panel";
 import { Overview } from "../components/profile/overview";
 import { Ratings } from "../components/profile/ratings";
 import { requireSession } from "../lib/auth";
+import { useOverlayCards } from "../lib/overlay-cards-setting";
 import { usePolishQuotes } from "../lib/polish-quotes-setting";
 import { PRIVACY, PRIVACY_LABELS, useProfile, useProfileStats, useUpdateProfile, type Notifications } from "../lib/profile";
 import { supabase } from "../lib/supabase";
@@ -103,6 +104,7 @@ function Settings({ session, userId, username }: SettingsProps) {
   const update = useUpdateProfile(userId);
   const theme = useTheme();
   const [polishQuotes, setPolishQuotes] = usePolishQuotes();
+  const [overlayCards, setOverlayCards] = useOverlayCards();
   const currentEmail = session.user.email ?? "";
   const [draftUsername, setDraftUsername] = useState(username);
   const [draftEmail, setDraftEmail] = useState(currentEmail);
@@ -160,6 +162,13 @@ function Settings({ session, userId, username }: SettingsProps) {
               <span className="text-[13px] leading-[18px] text-muted-foreground">Dodaje do cytatów na stronie głównej kwestie z polskich gier i dubbingów, także z wulgaryzmami. Ustawienie dotyczy tej przeglądarki.</span>
             </div>
             <Switch label="Polskie cytaty" checked={polishQuotes} onChange={setPolishQuotes} />
+          </div>
+          <div className="flex items-center justify-between gap-4 border-t border-border pt-4">
+            <div className="flex min-w-0 flex-col gap-0.5">
+              <span className="text-[15px] leading-[22px] font-semibold">Nowy wygląd kafli</span>
+              <span className="text-[13px] leading-[18px] text-muted-foreground">Okładka na całym kaflu z nakładką na tytuł i przyciski. Po wyłączeniu wracają klasyczne kafle. Ustawienie dotyczy tej przeglądarki.</span>
+            </div>
+            <Switch label="Nowy wygląd kafli" checked={overlayCards} onChange={setOverlayCards} />
           </div>
         </Panel>
       </div>
