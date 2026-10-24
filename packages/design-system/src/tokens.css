@@ -125,6 +125,11 @@
   to { background-position: -250% 0; }
 }
 
+@keyframes hero-progress {
+  from { transform: scaleX(0); }
+  to { transform: scaleX(1); }
+}
+
 @keyframes bar-in {
   from { transform: scaleY(0); opacity: 0; }
 }
