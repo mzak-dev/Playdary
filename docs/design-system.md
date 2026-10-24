@@ -36,3 +36,9 @@ Source: the Plogamer design system artifact. Tokens live in `packages/design-sys
 
 - Enter in the nav search opens `/search?q=`; results come from `search_games` (60 rows) and are filtered and sorted on the client.
 - Below `sm` the nav collapses to a Menu button that opens the staggered panel (links, search, shortcuts).
+
+## Motion and primitives
+
+- `motion` (Framer Motion) drives the staggered menu, `BlurText` and `Reveal`; anime.js stays for `CountUp` and gallery.
+- shadcn components live in `packages/design-system/src/components/ui` (`components.json` there); `Sheet` hosts the mobile search filters and needs `tw-animate-css`.
+- `BlurText` is adapted from React Bits.

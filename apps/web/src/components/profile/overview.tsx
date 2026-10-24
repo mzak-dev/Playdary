@@ -1,18 +1,20 @@
-import { Avatar, Button, MatchMeter, Skeleton } from "@playdary/design-system";
+import { Avatar, Button, CountUp, MatchMeter, Reveal, Skeleton } from "@playdary/design-system";
 import { useNavigate } from "@tanstack/react-router";
 import type { ReactNode } from "react";
 import { useFriendCards } from "../../lib/friends";
 import { useMyFriends, useRatedGames } from "../../lib/profile";
 import { averageScore, histogram, ratingsCount, topGenres } from "../../lib/taste";
 
-const Card = ({ title, action, className = "", children }: { title: string; action?: ReactNode; className?: string; children: ReactNode }) => (
-  <section className={`flex flex-col gap-4 rounded-lg bg-secondary p-6 ${className}`}>
-    <div className="flex items-center justify-between gap-3">
-      <h3 className="text-xs leading-4 font-bold tracking-wider text-primary uppercase">{title}</h3>
-      {action}
-    </div>
-    {children}
-  </section>
+const Card = ({ title, action, className = "", index = 0, children }: { title: string; action?: ReactNode; className?: string; index?: number; children: ReactNode }) => (
+  <Reveal index={index} className={`flex ${className}`}>
+    <section className="flex w-full flex-col gap-4 rounded-lg bg-secondary p-6">
+      <div className="flex items-center justify-between gap-3">
+        <h3 className="text-xs leading-4 font-bold tracking-wider text-primary uppercase">{title}</h3>
+        {action}
+      </div>
+      {children}
+    </section>
+  </Reveal>
 );
 
 export function Overview({ userId, onShowRatings }: { userId: string; onShowRatings: () => void }) {
@@ -41,7 +43,8 @@ export function Overview({ userId, onShowRatings }: { userId: string; onShowRati
         ) : (
           <>
             <div className="flex items-baseline gap-3">
-              <b className="font-display text-5xl leading-none font-extrabold tabular-nums text-rating">{average.toFixed(1)}</b>
+              <b className="font-display text-5xl leading-none font-extrabold tabular-nums text-rating"><CountUp to={average} decimals={1} />
+              </b>
               <span className="text-sm text-muted-foreground">średnia z {ratingsCount(ratings.length)}</span>
             </div>
             <div role="img" aria-label="Rozkład Twoich ocen od 1 do 10" className="grid h-28 grid-cols-10 items-end gap-1.5">
@@ -56,7 +59,7 @@ export function Overview({ userId, onShowRatings }: { userId: string; onShowRati
         )}
       </Card>
 
-      <Card title="Twoja półka" className="md:col-span-3" action={<span className="text-[13px] text-muted-foreground">Najwyżej ocenione</span>}>
+      <Card title="Twoja półka" index={1} className="md:col-span-3" action={<span className="text-[13px] text-muted-foreground">Najwyżej ocenione</span>}>
         {ratings.length === 0 && <p className="text-muted-foreground">Nie oceniono jeszcze żadnej gry.</p>}
         <div className="grid grid-cols-3 gap-3">
           {ratings.slice(0, 3).map(({ game, score }) => (
@@ -76,7 +79,7 @@ export function Overview({ userId, onShowRatings }: { userId: string; onShowRati
         )}
       </Card>
 
-      <Card title="Ulubione gatunki" className="md:col-span-2">
+      <Card title="Ulubione gatunki" index={2} className="md:col-span-2">
         {genres.length === 0 && <p className="text-muted-foreground">Pojawią się po pierwszych ocenach.</p>}
         <div className="flex flex-col gap-3">
           {genres.map(([name, n]) => (
@@ -93,6 +96,7 @@ export function Overview({ userId, onShowRatings }: { userId: string; onShowRati
 
       <Card
         title={`Znajomi · ${friends.data?.length ?? 0}`}
+        index={3}
         className="md:col-span-4"
         action={
           <Button variant="ghost" size="sm" onClick={() => navigate({ to: "/friends", search: { tab: "Znajomi" } })}>
