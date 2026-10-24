@@ -8,3 +8,5 @@ dist
 apps/backend/supabase/.temp
 apps/web/src/routeTree.gen.ts
 .claude
+.expo
+expo-env.d.ts
