@@ -1,5 +1,6 @@
 import { cn } from "../lib/cn";
 import { Avatar } from "./avatar";
+import { CountUp } from "./count-up";
 import { GameCover } from "./game-cover";
 
 export type ActivityKind = "rated" | "done" | "follow" | "wish";
@@ -32,7 +33,7 @@ export function ActivityItem({ name, when, kind, score, game, onOpen }: Activity
           <span className="text-[13px] leading-[18px] text-muted-foreground">{when}</span>
         </span>
         <span className="flex flex-wrap items-center gap-x-2 gap-y-1 text-sm leading-5">
-          <span className={cn("rounded-full px-2.5 py-0.5 text-xs leading-[18px] font-semibold", style)}>{kind === "rated" && score ? `Ocena ${score}/10` : label}</span>
+          <span className={cn("rounded-full px-2.5 py-0.5 text-xs leading-[18px] font-semibold", style)}>{kind === "rated" && score ? <>Ocena <CountUp to={score} />/10</> : label}</span>
           <span className="font-medium">{game.title}</span>
         </span>
       </span>

@@ -125,6 +125,10 @@
   to { background-position: -250% 0; }
 }
 
+@keyframes bar-in {
+  from { transform: scaleY(0); opacity: 0; }
+}
+
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
     animation: none !important;

@@ -1,10 +1,11 @@
-import { Avatar, Button, GameRow, PageHero, Rating, SegmentedControl, Skeleton, Switch, TextField } from "@playdary/design-system";
+import { Avatar, Button, PageHero, RatedGameRow, SegmentedControl, Skeleton, Switch, TextField } from "@playdary/design-system";
 import type { Session } from "@supabase/supabase-js";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState, type FormEvent } from "react";
 import { AppShell } from "../components/app-shell";
 import { Panel, SectionHeading } from "../components/panel";
 import { requireSession } from "../lib/auth";
+import { useSetList, useUserLists } from "../lib/library";
 import { usePolishQuotes } from "../lib/polish-quotes-setting";
 import { PRIVACY, PRIVACY_LABELS, useMyFriends, useProfile, useProfileStats, useRatedGames, useUpdateProfile, type Notifications } from "../lib/profile";
 import { supabase } from "../lib/supabase";
@@ -80,6 +81,8 @@ function Overview({ userId }: { userId: string }) {
   const navigate = useNavigate();
   const rated = useRatedGames(userId);
   const friends = useMyFriends(userId);
+  const lists = useUserLists(userId);
+  const setList = useSetList(userId);
 
   return (
     <div className="flex flex-col gap-12">
@@ -97,14 +100,16 @@ function Overview({ userId }: { userId: string }) {
           </div>
         )}
         {rated.data?.length === 0 && <p className="text-muted-foreground">Nie oceniono jeszcze żadnej gry. Oceń grę na jej stronie.</p>}
-        <div className="flex flex-col gap-1">
+        <div className="flex flex-col gap-3">
           {rated.data?.map(({ game, score }) => (
-            <div key={game.id} className="flex flex-wrap items-center gap-x-4 gap-y-2">
-              <div className="min-w-0 flex-[1_1_min(560px,100%)]">
-                <GameRow game={game} onOpen={() => navigate({ to: "/games/$gameId", params: { gameId: String(game.id) } })} />
-              </div>
-              <Rating value={score} readOnly />
-            </div>
+            <RatedGameRow
+              key={game.id}
+              game={game}
+              score={score}
+              list={lists.data?.[game.id] ?? null}
+              onListChange={(list) => setList.mutate({ gameId: game.id, list })}
+              onOpen={() => navigate({ to: "/games/$gameId", params: { gameId: String(game.id) } })}
+            />
           ))}
         </div>
       </section>
