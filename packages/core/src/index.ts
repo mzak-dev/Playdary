@@ -11,6 +11,7 @@ export * from "./games";
 export { igdbImage } from "./igdb-image";
 export * from "./labels";
 export * from "./library";
+export { LISTS } from "./lists";
 export type { Embedder, KeyValueStorage } from "./platform";
 export * from "./profile";
 export * from "./provider";

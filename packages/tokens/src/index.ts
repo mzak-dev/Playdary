@@ -78,3 +78,8 @@ export const fonts = {
     "sans-bold": "DMSans_700Bold",
   },
 } as const;
+
+export const nativeSoftColors = {
+  dark: { primarySoft: "rgba(31, 169, 236, 0.15)", ratingSoft: "rgba(245, 233, 10, 0.15)", successSoft: "rgba(47, 209, 88, 0.15)", inputSoft: "rgba(110, 110, 121, 0.4)" },
+  light: { primarySoft: "rgba(8, 112, 166, 0.12)", ratingSoft: "rgba(138, 109, 0, 0.14)", successSoft: "rgba(19, 122, 46, 0.12)", inputSoft: "rgba(113, 113, 122, 0.4)" },
+} as const;

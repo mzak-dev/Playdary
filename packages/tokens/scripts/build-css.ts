@@ -1,5 +1,5 @@
 import { writeFileSync } from "node:fs";
-import { baseRadius, darkColors, fonts, lightColors, popShadow, radii, type ColorToken } from "../src/index.ts";
+import { baseRadius, darkColors, fonts, lightColors, nativeSoftColors, popShadow, radii, type ColorToken } from "../src/index.ts";
 
 const kebab = (name: string) => name.replace(/[A-Z]/g, (letter) => `-${letter.toLowerCase()}`);
 
@@ -34,20 +34,24 @@ ${themeInline(fonts.web)}
 }
 `;
 
+const softDeclarations = (colors: Record<string, string>) => Object.entries(colors).map(([name, value]) => `  --${kebab(name)}: ${value};`);
+const softTheme = Object.keys(nativeSoftColors.dark).map((name) => `  --color-${kebab(name)}: var(--${kebab(name)});`);
+
 const native = `${header}
 
 :root {
-${darkRoot.join("\n")}
+${[...darkRoot, ...softDeclarations(nativeSoftColors.dark)].join("\n")}
 }
 
 @media (prefers-color-scheme: light) {
   :root {
-${lightOverrides.map((line) => `  ${line}`).join("\n")}
+${[...lightOverrides, ...softDeclarations(nativeSoftColors.light)].map((line) => `  ${line}`).join("\n")}
   }
 }
 
 @theme inline {
 ${themeInline(fonts.native)}
+${softTheme.join("\n")}
 }
 `;
 

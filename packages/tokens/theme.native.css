@@ -32,6 +32,10 @@
   --cover-sky: #4cc3ff;
   --pop-shadow: 0 16px 40px 0 rgba(0, 0, 0, 0.6);
   --radius: 28px;
+  --primary-soft: rgba(31, 169, 236, 0.15);
+  --rating-soft: rgba(245, 233, 10, 0.15);
+  --success-soft: rgba(47, 209, 88, 0.15);
+  --input-soft: rgba(110, 110, 121, 0.4);
 }
 
 @media (prefers-color-scheme: light) {
@@ -59,6 +63,10 @@
     --success-foreground: #ffffff;
     --rating: #8a6d00;
     --pop-shadow: 0 16px 40px 0 rgba(9, 9, 11, 0.18);
+    --primary-soft: rgba(8, 112, 166, 0.12);
+    --rating-soft: rgba(138, 109, 0, 0.14);
+    --success-soft: rgba(19, 122, 46, 0.12);
+    --input-soft: rgba(113, 113, 122, 0.4);
   }
 }
 
@@ -104,4 +112,8 @@
   --font-sans-medium: DMSans_500Medium;
   --font-sans-semibold: DMSans_600SemiBold;
   --font-sans-bold: DMSans_700Bold;
+  --color-primary-soft: var(--primary-soft);
+  --color-rating-soft: var(--rating-soft);
+  --color-success-soft: var(--success-soft);
+  --color-input-soft: var(--input-soft);
 }
