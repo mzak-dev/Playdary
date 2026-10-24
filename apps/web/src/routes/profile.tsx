@@ -1,17 +1,18 @@
-import { Avatar, Button, PageHero, RatedGameRow, SegmentedControl, Skeleton, Switch, TextField } from "@playdary/design-system";
+import { Avatar, Button, PageHero, SegmentedControl, Switch, TextField } from "@playdary/design-system";
 import type { Session } from "@supabase/supabase-js";
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { useState, type FormEvent } from "react";
 import { AppShell } from "../components/app-shell";
-import { Panel, SectionHeading } from "../components/panel";
+import { Panel } from "../components/panel";
+import { Overview } from "../components/profile/overview";
+import { Ratings } from "../components/profile/ratings";
 import { requireSession } from "../lib/auth";
-import { useSetList, useUserLists } from "../lib/library";
 import { usePolishQuotes } from "../lib/polish-quotes-setting";
-import { PRIVACY, PRIVACY_LABELS, useMyFriends, useProfile, useProfileStats, useRatedGames, useUpdateProfile, type Notifications } from "../lib/profile";
+import { PRIVACY, PRIVACY_LABELS, useProfile, useProfileStats, useUpdateProfile, type Notifications } from "../lib/profile";
 import { supabase } from "../lib/supabase";
 import { THEMES, setTheme, useTheme } from "../lib/theme";
 
-const SECTIONS = ["Przegląd", "Ustawienia"] as const;
+const SECTIONS = ["Przegląd", "Oceny", "Ustawienia"] as const;
 
 export const Route = createFileRoute("/profile")({
   beforeLoad: async () => ({ session: await requireSession() }),
@@ -38,6 +39,13 @@ function ProfilePage() {
   const stats = useProfileStats(userId);
   const [section, setSection] = useState<(typeof SECTIONS)[number]>(Route.useSearch().section ?? "Przegląd");
   const username = profile.data?.username ?? session.user.email?.split("@")[0] ?? "";
+  const [shared, setShared] = useState(false);
+
+  const share = async () => {
+    await navigator.clipboard.writeText(`${location.origin}/u/${username}`);
+    setShared(true);
+    setTimeout(() => setShared(false), 2500);
+  };
 
   const statItems = [
     { label: "Obserwowane", value: stats.data?.follows },
@@ -50,8 +58,11 @@ function ProfilePage() {
     <AppShell session={session} active="profile">
       <PageHero className="pb-[104px]" contentClassName="flex-row flex-wrap items-center gap-x-8 gap-y-6">
         <Avatar name={username || "?"} size="lg" />
-        <div className="flex flex-col gap-4">
-          <h1 className="font-display text-[clamp(30px,8vw,40px)] leading-[1.1] font-extrabold tracking-tight">{username}</h1>
+        <div className="flex min-w-0 flex-col gap-4">
+          <div className="flex flex-col gap-1">
+            <h1 className="font-display text-[clamp(30px,8vw,40px)] leading-[1.1] font-extrabold tracking-tight">{username}</h1>
+            <span className="text-sm leading-5 text-muted-foreground">@{username}</span>
+          </div>
           <dl className="flex flex-wrap gap-x-10 gap-y-2">
             {statItems.map((item) => (
               <div key={item.label} className="flex flex-col-reverse gap-0.5">
@@ -61,6 +72,13 @@ function ProfilePage() {
             ))}
           </dl>
         </div>
+        <div className="flex flex-wrap items-center gap-3 lg:ml-auto">
+          <Button onClick={() => setSection("Ustawienia")}>Edytuj profil</Button>
+          <Button variant="secondary" onClick={share}>
+            Udostępnij
+          </Button>
+          <span role="status" className="text-sm font-semibold text-success">{shared ? "Skopiowano link" : ""}</span>
+        </div>
       </PageHero>
 
       <div className="relative z-[3] -mt-[72px] min-h-[55vh] rounded-t-xl border border-b-0 border-white/5 bg-card/90 px-4 pt-10 pb-18 shadow-[inset_0_1px_0_rgba(255,255,255,0.06),0_-24px_60px_rgba(0,0,0,0.35)] sm:bg-card/70 sm:px-8 sm:backdrop-blur-xl">
@@ -69,70 +87,12 @@ function ProfilePage() {
             <SegmentedControl label="Sekcje profilu" items={SECTIONS} value={section} onChange={setSection} />
           </div>
           {profile.error && <p role="alert" className="text-sm font-medium text-destructive">Nie udało się wczytać profilu: {profile.error.message}</p>}
-          {section === "Przegląd" && <Overview userId={userId} />}
+          {section === "Przegląd" && <Overview userId={userId} onShowRatings={() => setSection("Oceny")} />}
+          {section === "Oceny" && <Ratings userId={userId} />}
           {section === "Ustawienia" && profile.data && <Settings session={session} userId={userId} username={profile.data.username} />}
         </div>
       </div>
     </AppShell>
-  );
-}
-
-function Overview({ userId }: { userId: string }) {
-  const navigate = useNavigate();
-  const rated = useRatedGames(userId);
-  const friends = useMyFriends(userId);
-  const lists = useUserLists(userId);
-  const setList = useSetList(userId);
-
-  return (
-    <div className="flex flex-col gap-12">
-      <section className="flex flex-col gap-4">
-        <SectionHeading>Twoje oceny</SectionHeading>
-        {rated.error && <p role="alert" className="text-sm font-medium text-destructive">Nie udało się wczytać ocen: {rated.error.message}</p>}
-        {rated.isPending && (
-          <div aria-hidden className="flex flex-col gap-1">
-            {[0, 1].map((i) => (
-              <div key={i} className="flex items-center gap-4 px-4 py-3">
-                <Skeleton className="h-[60px] w-[88px] shrink-0" />
-                <Skeleton className="h-4 w-1/3" />
-              </div>
-            ))}
-          </div>
-        )}
-        {rated.data?.length === 0 && <p className="text-muted-foreground">Nie oceniono jeszcze żadnej gry. Oceń grę na jej stronie.</p>}
-        <div className="flex flex-col gap-3">
-          {rated.data?.map(({ game, score }) => (
-            <RatedGameRow
-              key={game.id}
-              game={game}
-              score={score}
-              list={lists.data?.[game.id] ?? null}
-              onListChange={(list) => setList.mutate({ gameId: game.id, list })}
-              onOpen={() => navigate({ to: "/games/$gameId", params: { gameId: String(game.id) } })}
-            />
-          ))}
-        </div>
-      </section>
-
-      <section className="flex flex-col gap-4">
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <SectionHeading>Znajomi</SectionHeading>
-          <Button variant="secondary" size="sm" onClick={() => navigate({ to: "/friends", search: { tab: "Znajomi" } })}>
-            Zobacz wszystkich
-          </Button>
-        </div>
-        {friends.error && <p role="alert" className="text-sm font-medium text-destructive">Nie udało się wczytać znajomych: {friends.error.message}</p>}
-        {friends.data?.length === 0 && <p className="text-muted-foreground">Nie masz jeszcze znajomych.</p>}
-        <ul className="flex flex-wrap gap-3">
-          {friends.data?.map((friend) => (
-            <li key={friend.id} className="flex items-center gap-2 rounded-full bg-secondary py-1.5 pr-4 pl-1.5 text-sm font-semibold">
-              <Avatar name={friend.username} size="sm" />
-              {friend.username}
-            </li>
-          ))}
-        </ul>
-      </section>
-    </div>
   );
 }
 
