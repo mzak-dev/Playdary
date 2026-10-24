@@ -6,8 +6,7 @@ import { AddTab } from "../components/friends/add-tab";
 import { FriendsTab } from "../components/friends/friends-tab";
 import { RequestsTab } from "../components/friends/requests-tab";
 import { requireSession } from "../lib/auth";
-import { friendsCount, useFriendCards, useFriendRequests } from "../lib/friends";
-import { useProfileStats } from "../lib/profile";
+import { friendsCount, useFriendCards, useFriendRequests, useProfileStats } from "@playdary/core";
 
 const TABS = ["Aktywność", "Znajomi", "Zaproszenia", "Dodaj"] as const;
 type Tab = (typeof TABS)[number];

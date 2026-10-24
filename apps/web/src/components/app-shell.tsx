@@ -4,9 +4,7 @@ import { useNavigate, useRouterState } from "@tanstack/react-router";
 import { useState, type ReactNode } from "react";
 import { AiChat } from "./ai-chat";
 import { useServerEmbeddings } from "../lib/embed-settings";
-import { useFriendRequests } from "../lib/friends";
-import { useSearch } from "../lib/games";
-import { useUsername } from "../lib/profile";
+import { useFriendRequests, useSearch, useUsername } from "@playdary/core";
 import { supabase } from "../lib/supabase";
 import { useDebounced } from "../lib/use-debounced";
 

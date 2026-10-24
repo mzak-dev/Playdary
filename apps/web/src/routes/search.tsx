@@ -5,11 +5,7 @@ import { useMemo, useState, type FormEvent } from "react";
 import { AppShell } from "../components/app-shell";
 import { GameEmptyState } from "../components/game-empty-state";
 import { requireSession } from "../lib/auth";
-import { GENRES, PERIODS, PLATFORMS, SCORES } from "../lib/filters";
-import { gamesCount } from "../lib/format";
-import { useFollows, useFriends, useSearchResults, useToggleFollow } from "../lib/games";
-import { useSetList, useUserLists } from "../lib/library";
-import { DEFAULT_SEARCH_FILTERS, SEARCH_SORTS, facetCounts, filterGames, searchFilterCount, type SearchFilters } from "../lib/search-filters";
+import { GENRES, PERIODS, PLATFORMS, SCORES, gamesCount, useFollows, useFriends, useSearchResults, useToggleFollow, useSetList, useUserLists, DEFAULT_SEARCH_FILTERS, SEARCH_SORTS, facetCounts, filterGames, searchFilterCount, type SearchFilters } from "@playdary/core";
 
 export const Route = createFileRoute("/search")({
   beforeLoad: async () => ({ session: await requireSession() }),

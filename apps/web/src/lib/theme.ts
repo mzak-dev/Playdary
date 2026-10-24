@@ -1,34 +1,17 @@
-import { useSyncExternalStore } from "react";
+import { createSetting, decodeTheme, THEMES, useSetting, type Theme } from "@playdary/core";
+import { webStorage } from "./web-storage";
 
-export const THEMES = ["Ciemny", "Jasny"] as const;
-export type Theme = (typeof THEMES)[number];
+export { THEMES, type Theme };
 
-const STORAGE_KEY = "playdary:theme";
-const listeners = new Set<() => void>();
+const themeSetting = createSetting<Theme>({ storage: webStorage, key: "playdary:theme", fallback: "Ciemny", decode: decodeTheme, encode: (theme) => theme });
 
-const read = (): Theme => {
-  try {
-    return localStorage.getItem(STORAGE_KEY) === "Jasny" ? "Jasny" : "Ciemny";
-  } catch {
-    return "Ciemny";
-  }
-};
+const applyTheme = (theme: Theme) => document.documentElement.classList.toggle("light", theme === "Jasny");
 
-export const applyStoredTheme = () => document.documentElement.classList.toggle("light", read() === "Jasny");
+export const applyStoredTheme = () => applyTheme(themeSetting.get());
 
 export function setTheme(theme: Theme) {
-  try {
-    localStorage.setItem(STORAGE_KEY, theme);
-  } catch {
-    // storage unavailable: theme applies for this session only
-  }
-  document.documentElement.classList.toggle("light", theme === "Jasny");
-  listeners.forEach((listener) => listener());
+  applyTheme(theme);
+  themeSetting.set(theme);
 }
 
-const subscribe = (listener: () => void) => {
-  listeners.add(listener);
-  return () => listeners.delete(listener);
-};
-
-export const useTheme = () => useSyncExternalStore(subscribe, read, () => "Ciemny" as Theme);
+export const useTheme = () => useSetting(themeSetting)[0];

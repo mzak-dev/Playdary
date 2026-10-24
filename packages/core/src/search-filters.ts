@@ -1,4 +1,4 @@
-import type { Game, GameList } from "@playdary/design-system";
+import type { Game, GameList } from "./types";
 import { GENRES, PERIODS, PLATFORMS, SCORES } from "./filters";
 import { polishTags } from "./labels";
 

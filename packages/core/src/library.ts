@@ -1,12 +1,13 @@
-import type { Game, GameList } from "@playdary/design-system";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { GAME_COLUMNS, toGame, type GameRow } from "./games";
-import { supabase } from "./supabase";
+import { usePlaydary } from "./provider";
+import type { Game, GameList } from "./types";
 
 type ListsByGame = Record<number, GameList>;
 
-export const useUserLists = (userId: string) =>
-  useQuery({
+export const useUserLists = (userId: string) => {
+  const { supabase } = usePlaydary();
+  return useQuery({
     queryKey: ["lists", userId],
     queryFn: async (): Promise<ListsByGame> => {
       const { data, error } = await supabase.from("list_items").select("game_id, lists(name)");
@@ -18,9 +19,11 @@ export const useUserLists = (userId: string) =>
       return byGame;
     },
   });
+};
 
-export const useListedGames = (userId: string) =>
-  useQuery({
+export const useListedGames = (userId: string) => {
+  const { supabase } = usePlaydary();
+  return useQuery({
     queryKey: ["lists-games", userId],
     queryFn: async (): Promise<Game[]> => {
       const { data, error } = await supabase.from("list_items").select(`game_id, games(${GAME_COLUMNS})`);
@@ -28,8 +31,10 @@ export const useListedGames = (userId: string) =>
       return (data as unknown as { games: GameRow | null }[]).flatMap((row) => (row.games ? [toGame(row.games)] : []));
     },
   });
+};
 
 export function useSetList(userId: string) {
+  const { supabase } = usePlaydary();
   const client = useQueryClient();
   const key = ["lists", userId];
 
@@ -58,8 +63,9 @@ export function useSetList(userId: string) {
   });
 }
 
-export const useMyRating = (userId: string, gameId: number) =>
-  useQuery({
+export const useMyRating = (userId: string, gameId: number) => {
+  const { supabase } = usePlaydary();
+  return useQuery({
     queryKey: ["rating", userId, gameId],
     queryFn: async () => {
       const { data, error } = await supabase.from("ratings").select("score").eq("user_id", userId).eq("game_id", gameId).maybeSingle();
@@ -67,8 +73,10 @@ export const useMyRating = (userId: string, gameId: number) =>
       return (data?.score as number | undefined) ?? 0;
     },
   });
+};
 
 export function useSetRating(userId: string, gameId: number) {
+  const { supabase } = usePlaydary();
   const client = useQueryClient();
   const key = ["rating", userId, gameId];
 

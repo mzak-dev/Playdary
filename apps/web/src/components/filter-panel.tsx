@@ -1,6 +1,6 @@
 import { Chip, SegmentedControl, SelectField, Switch } from "@playdary/design-system";
 import type { ReactNode } from "react";
-import { GENRES, PERIODS, PLATFORMS, SCORES, SORTS, type Filters } from "../lib/filters";
+import { GENRES, PERIODS, PLATFORMS, SCORES, SORTS, type Filters } from "@playdary/core";
 
 const toggle = (list: string[], item: string) => (list.includes(item) ? list.filter((x) => x !== item) : [...list, item]);
 

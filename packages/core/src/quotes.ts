@@ -1,4 +1,4 @@
-import type { Quote } from "@playdary/design-system";
+import type { Quote } from "./types";
 
 export const quotes: Quote[] = [
   { text: "War. War never changes.", game: "Fallout", year: 1997 },

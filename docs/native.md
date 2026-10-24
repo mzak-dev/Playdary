@@ -29,3 +29,12 @@
 ## Fonts
 
 React Native has no variable-weight fonts. Each weight is its own family (`Sora_700Bold`, `DMSans_400Regular`), so `font-display` maps to one weight and other weights need their own theme entries.
+
+## Shared code
+
+- `packages/core` has no DOM types (`lib: ES2023`), so the compiler rejects browser-only code. Hooks read the Supabase client and the embedder from `PlaydaryProvider`; each app builds them for its platform.
+- `KeyValueStorage` is synchronous (localStorage, MMKV, `expo-sqlite/kv-store`). AsyncStorage is async, so native hydrates a cache before first render.
+- `Embedder` is chosen per app: web switches between the Web Worker and `createServerEmbedder`, native uses only the server one.
+- React, `react-dom` and `@tanstack/react-query` come from the `catalog:` in `pnpm-workspace.yaml`, so the whole repo resolves one copy; two copies break React context in Metro.
+- Database types live in `packages/core/src/database.types.ts`; refresh with `pnpm --filter @playdary/backend db:types` (needs `supabase link`). Function return types are generated as non-null, so check nullable columns by hand.
+- Tokens: edit `packages/tokens/src/index.ts`, then `pnpm --filter @playdary/tokens build` rewrites both CSS files (committed, so dev servers need no build step).

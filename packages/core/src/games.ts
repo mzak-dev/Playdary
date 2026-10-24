@@ -1,10 +1,9 @@
-import type { Friend, Game } from "@playdary/design-system";
 import { keepPreviousData, useInfiniteQuery, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { embedText } from "./embed";
-import { useServerEmbeddings } from "./embed-settings";
+import type { PlaydaryClient } from "./client";
 import { toRpcParams, type Filters } from "./filters";
 import { polishTags } from "./labels";
-import { supabase } from "./supabase";
+import { usePlaydary } from "./provider";
+import type { Friend, Game } from "./types";
 
 export type GameRow = {
   id: number;
@@ -42,24 +41,29 @@ const toGames = ({ data, error }: Result) => {
   return ((data ?? []) as GameRow[]).map(toGame);
 };
 
-const games = () => supabase.from("games").select(GAME_COLUMNS);
+const gamesTable = (supabase: PlaydaryClient) => supabase.from("games").select(GAME_COLUMNS);
 
-export const useTopUpcoming = () =>
-  useQuery({
+export const useTopUpcoming = () => {
+  const { supabase } = usePlaydary();
+  return useQuery({
     queryKey: ["games", "top-upcoming"],
     staleTime: STALE_TIME,
-    queryFn: async () => toGames(await games().gt("release_date", Date.now()).order("hypes", { ascending: false }).limit(10)),
+    queryFn: async () => toGames(await gamesTable(supabase).gt("release_date", Date.now()).order("hypes", { ascending: false }).limit(10)),
   });
+};
 
-export const useTicker = () =>
-  useQuery({
+export const useTicker = () => {
+  const { supabase } = usePlaydary();
+  return useQuery({
     queryKey: ["games", "ticker"],
     staleTime: STALE_TIME,
-    queryFn: async () => toGames(await games().gt("release_date", Date.now()).order("release_date").limit(20)),
+    queryFn: async () => toGames(await gamesTable(supabase).gt("release_date", Date.now()).order("release_date").limit(20)),
   });
+};
 
-export const useBrowse = (filters: Filters) =>
-  useInfiniteQuery({
+export const useBrowse = (filters: Filters) => {
+  const { supabase } = usePlaydary();
+  return useInfiniteQuery({
     queryKey: ["games", "browse", filters],
     initialPageParam: 0,
     staleTime: STALE_TIME,
@@ -75,6 +79,10 @@ export const useBrowse = (filters: Filters) =>
       return loaded < last.total ? loaded : undefined;
     },
   });
+};
+
+// pgvector takes a JSON array although the generated type says string
+const asVector = (embedding: number[] | null) => (embedding ?? undefined) as unknown as string | undefined;
 
 type SearchRow = { id: number; name: string; data: { cover: string | null; genres: string[]; themes: string[]; platforms: string[] } };
 
@@ -143,8 +151,9 @@ type DetailRow = Omit<GameRow, "cover" | "genres" | "themes" | "platforms"> & {
   };
 };
 
-export const useGame = (gameId: number) =>
-  useQuery({
+export const useGame = (gameId: number) => {
+  const { supabase } = usePlaydary();
+  return useQuery({
     queryKey: ["games", "detail", gameId],
     staleTime: STALE_TIME,
     queryFn: async (): Promise<GameDetail | null> => {
@@ -167,9 +176,11 @@ export const useGame = (gameId: number) =>
       };
     },
   });
+};
 
-export const useExistingGameIds = (ids: number[]) =>
-  useQuery({
+export const useExistingGameIds = (ids: number[]) => {
+  const { supabase } = usePlaydary();
+  return useQuery({
     queryKey: ["games", "existing", ids],
     enabled: ids.length > 0,
     staleTime: STALE_TIME,
@@ -179,11 +190,13 @@ export const useExistingGameIds = (ids: number[]) =>
       return new Set(data.map((row) => row.id as number));
     },
   });
+};
 
 export type Requirements = { minimum: { key: string; value: string }[]; recommended: { key: string; value: string }[] };
 
-export const useRequirements = (steamId: string | null) =>
-  useQuery({
+export const useRequirements = (steamId: string | null) => {
+  const { supabase } = usePlaydary();
+  return useQuery({
     queryKey: ["requirements", steamId],
     enabled: steamId !== null,
     staleTime: STALE_TIME,
@@ -194,9 +207,11 @@ export const useRequirements = (steamId: string | null) =>
       return data;
     },
   });
+};
 
-export const useSimilar = (gameId: number) =>
-  useQuery({
+export const useSimilar = (gameId: number) => {
+  const { supabase } = usePlaydary();
+  return useQuery({
     queryKey: ["games", "similar", gameId],
     staleTime: STALE_TIME,
     queryFn: async () => {
@@ -204,19 +219,21 @@ export const useSimilar = (gameId: number) =>
       return toGames({ data, error });
     },
   });
+};
 
 const useQueryEmbedding = (query: string) => {
-  const [serverEmbeddings] = useServerEmbeddings();
+  const { embedder } = usePlaydary();
   return useQuery({
-    queryKey: ["embedding", query, serverEmbeddings],
+    queryKey: ["embedding", query, embedder.id],
     enabled: query.length > 1,
     staleTime: Infinity,
     retry: false,
-    queryFn: () => embedText(query),
+    queryFn: () => embedder.embed(query),
   });
 };
 
 export const useSearch = (query: string) => {
+  const { supabase } = usePlaydary();
   const embedding = useQueryEmbedding(query).data ?? null;
 
   return useQuery({
@@ -224,9 +241,9 @@ export const useSearch = (query: string) => {
     enabled: query.length > 1,
     placeholderData: keepPreviousData,
     queryFn: async (): Promise<Game[]> => {
-      const { data, error } = await supabase.rpc("search_games", { q: query, q_embedding: embedding, lim: 6 });
+      const { data, error } = await supabase.rpc("search_games", { q: query, q_embedding: asVector(embedding), lim: 6 });
       if (error) throw new Error(error.message);
-      return (data as SearchRow[]).map((row) => ({
+      return (data as unknown as SearchRow[]).map((row) => ({
         id: row.id,
         title: row.name,
         genres: polishTags(row.data.themes, row.data.genres),
@@ -243,6 +260,7 @@ export const useSearch = (query: string) => {
 const RESULTS_LIMIT = 60;
 
 export const useSearchResults = (query: string) => {
+  const { supabase } = usePlaydary();
   const embedding = useQueryEmbedding(query).data ?? null;
 
   return useQuery({
@@ -251,10 +269,10 @@ export const useSearchResults = (query: string) => {
     staleTime: STALE_TIME,
     placeholderData: keepPreviousData,
     queryFn: async (): Promise<Game[]> => {
-      const ranked = await supabase.rpc("search_games", { q: query, q_embedding: embedding, lim: RESULTS_LIMIT });
+      const ranked = await supabase.rpc("search_games", { q: query, q_embedding: asVector(embedding), lim: RESULTS_LIMIT });
       if (ranked.error) throw new Error(ranked.error.message);
-      const ids = (ranked.data as SearchRow[]).map((row) => row.id);
-      const found = toGames(await games().in("id", ids));
+      const ids = (ranked.data as unknown as SearchRow[]).map((row) => row.id);
+      const found = toGames(await gamesTable(supabase).in("id", ids));
       return ids.flatMap((id) => found.filter((game) => game.id === id));
     },
   });
@@ -262,8 +280,9 @@ export const useSearchResults = (query: string) => {
 
 type FriendRow = { game_id: number; username: string; kind: Friend["kind"]; score: number | null };
 
-export const useFriends = (gameIds: number[]) =>
-  useQuery({
+export const useFriends = (gameIds: number[]) => {
+  const { supabase } = usePlaydary();
+  return useQuery({
     queryKey: ["friends", gameIds],
     enabled: gameIds.length > 0,
     staleTime: STALE_TIME,
@@ -278,9 +297,11 @@ export const useFriends = (gameIds: number[]) =>
       return byGame;
     },
   });
+};
 
-export const useFollows = (userId: string) =>
-  useQuery({
+export const useFollows = (userId: string) => {
+  const { supabase } = usePlaydary();
+  return useQuery({
     queryKey: ["follows", userId],
     queryFn: async () => {
       const { data, error } = await supabase.from("follows").select("game_id").eq("user_id", userId);
@@ -288,8 +309,10 @@ export const useFollows = (userId: string) =>
       return new Set(data.map((row) => row.game_id as number));
     },
   });
+};
 
 export function useToggleFollow(userId: string) {
+  const { supabase } = usePlaydary();
   const client = useQueryClient();
   const key = ["follows", userId];
 

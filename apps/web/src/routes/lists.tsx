@@ -4,8 +4,7 @@ import { useMemo, useState } from "react";
 import { AppShell } from "../components/app-shell";
 import { GameEmptyState } from "../components/game-empty-state";
 import { requireSession } from "../lib/auth";
-import { useFriends } from "../lib/games";
-import { useListedGames, useSetList, useUserLists } from "../lib/library";
+import { useFriends, useListedGames, useSetList, useUserLists } from "@playdary/core";
 
 export const Route = createFileRoute("/lists")({
   beforeLoad: async () => ({ session: await requireSession() }),

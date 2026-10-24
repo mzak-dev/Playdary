@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { igdbImage } from "../lib/igdb-image";
+import { igdbImage } from "@playdary/core";
 import GridMotion from "./grid-motion";
 import { Tag } from "./tag";
 

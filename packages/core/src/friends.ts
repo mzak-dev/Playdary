@@ -1,6 +1,7 @@
-import type { ActivityKind } from "@playdary/design-system";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { supabase } from "./supabase";
+import type { Database } from "./database.types";
+import { usePlaydary } from "./provider";
+import type { ActivityKind } from "./types";
 
 export type FriendCard = {
   id: string;
@@ -44,14 +45,18 @@ const toEvent = (row: EventRow): FriendEvent => ({
   createdAt: Date.parse(row.created_at),
 });
 
-const rpc = async <T>(name: string, args?: Record<string, unknown>) => {
-  const { data, error } = await supabase.rpc(name, args);
-  if (error) throw new Error(error.message);
-  return data as T;
+const useRpc = () => {
+  const { supabase } = usePlaydary();
+  return async <T,>(name: keyof Database["public"]["Functions"], args?: Record<string, unknown>) => {
+    const { data, error } = await supabase.rpc(name, args as never);
+    if (error) throw new Error(error.message);
+    return data as T;
+  };
 };
 
-export const useFriendCards = () =>
-  useQuery({
+export const useFriendCards = () => {
+  const rpc = useRpc();
+  return useQuery({
     queryKey: ["social", "cards"],
     queryFn: async (): Promise<FriendCard[]> => {
       const rows = await rpc<
@@ -69,15 +74,19 @@ export const useFriendCards = () =>
       }));
     },
   });
+};
 
-export const useFriendActivity = () =>
-  useQuery({
+export const useFriendActivity = () => {
+  const rpc = useRpc();
+  return useQuery({
     queryKey: ["social", "activity"],
     queryFn: async () => (await rpc<EventRow[]>("friend_activity", { p_limit: 40 })).map(toEvent),
   });
+};
 
-export const useFriendDetail = (friendId: string | null) =>
-  useQuery({
+export const useFriendDetail = (friendId: string | null) => {
+  const rpc = useRpc();
+  return useQuery({
     queryKey: ["social", "detail", friendId],
     enabled: friendId !== null,
     queryFn: async (): Promise<FriendDetail> => {
@@ -85,18 +94,22 @@ export const useFriendDetail = (friendId: string | null) =>
       return { common: data?.common ?? [], events: (data?.events ?? []).map(toEvent) };
     },
   });
+};
 
-export const useFriendRequests = () =>
-  useQuery({
+export const useFriendRequests = () => {
+  const rpc = useRpc();
+  return useQuery({
     queryKey: ["social", "requests"],
     queryFn: async (): Promise<FriendRequest[]> => {
       const rows = await rpc<{ direction: FriendRequest["direction"]; user_id: string; username: string; created_at: string; mutual: number }[]>("friend_requests");
       return rows.map((row) => ({ direction: row.direction, id: row.user_id, username: row.username, createdAt: Date.parse(row.created_at), mutual: row.mutual }));
     },
   });
+};
 
-export const useSearchUsers = (query: string) =>
-  useQuery({
+export const useSearchUsers = (query: string) => {
+  const rpc = useRpc();
+  return useQuery({
     queryKey: ["social", "search", query],
     enabled: query.length >= 2,
     queryFn: async (): Promise<FoundUser[]> => {
@@ -104,12 +117,14 @@ export const useSearchUsers = (query: string) =>
       return rows.map((row) => ({ id: row.user_id, username: row.username, relation: row.relation, mutual: row.mutual }));
     },
   });
+};
 
 const pairFilter = (a: string, b: string) => `and(user_id.eq.${a},friend_id.eq.${b}),and(user_id.eq.${b},friend_id.eq.${a})`;
 
 type Action = { kind: "send" | "accept" | "end" | "mute" | "unmute"; otherId: string };
 
 export function useFriendAction(userId: string) {
+  const { supabase } = usePlaydary();
   const client = useQueryClient();
 
   return useMutation({

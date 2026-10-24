@@ -8,7 +8,7 @@ import { Overview } from "../components/profile/overview";
 import { Ratings } from "../components/profile/ratings";
 import { requireSession } from "../lib/auth";
 import { usePolishQuotes } from "../lib/polish-quotes-setting";
-import { PRIVACY, PRIVACY_LABELS, useProfile, useProfileStats, useUpdateProfile, type Notifications } from "../lib/profile";
+import { PRIVACY, PRIVACY_LABELS, useProfile, useProfileStats, useUpdateProfile, type Notifications } from "@playdary/core";
 import { supabase } from "../lib/supabase";
 import { THEMES, setTheme, useTheme } from "../lib/theme";
 

@@ -6,13 +6,8 @@ import { AppShell } from "../components/app-shell";
 import { FilterPanel } from "../components/filter-panel";
 import { GameEmptyState } from "../components/game-empty-state";
 import { requireSession } from "../lib/auth";
-import { gamesCount } from "../lib/format";
-import { DEFAULT_FILTERS, TABS, activeFilterCount, type Filters, type TabLabel } from "../lib/filters";
-import { useBrowse, useFollows, useFriends, useTicker, useToggleFollow, useTopUpcoming } from "../lib/games";
-import { useSetList, useUserLists } from "../lib/library";
+import { gamesCount, DEFAULT_FILTERS, TABS, activeFilterCount, type Filters, type TabLabel, useBrowse, useFollows, useFriends, useTicker, useToggleFollow, useTopUpcoming, useSetList, useUserLists, useUsername, polishQuotes, quotes } from "@playdary/core";
 import { usePolishQuotes } from "../lib/polish-quotes-setting";
-import { useUsername } from "../lib/profile";
-import { polishQuotes, quotes } from "../quotes";
 
 export const Route = createFileRoute("/")({
   beforeLoad: async () => ({ session: await requireSession() }),

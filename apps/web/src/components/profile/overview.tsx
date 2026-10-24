@@ -1,9 +1,7 @@
 import { Avatar, Button, CountUp, MatchMeter, Reveal, Skeleton } from "@playdary/design-system";
 import { useNavigate } from "@tanstack/react-router";
 import type { ReactNode } from "react";
-import { useFriendCards } from "../../lib/friends";
-import { useMyFriends, useRatedGames } from "../../lib/profile";
-import { averageScore, histogram, ratingsCount, topGenres } from "../../lib/taste";
+import { useFriendCards, useMyFriends, useRatedGames, averageScore, histogram, ratingsCount, topGenres } from "@playdary/core";
 
 const Card = ({ title, action, className = "", index = 0, children }: { title: string; action?: ReactNode; className?: string; index?: number; children: ReactNode }) => (
   <Reveal index={index} className={`flex ${className}`}>

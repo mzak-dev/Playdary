@@ -13,7 +13,10 @@
 | --- | --- |
 | `apps/web` | React SPA deployed to GitHub Pages |
 | `apps/backend` | Supabase project: migrations, Edge Functions |
-| `packages/design-system` | Tokens, Tailwind theme, UI components |
+| `packages/design-system` | Web UI components (Tailwind v4, Radix) |
+| `packages/tokens` | Design tokens in TS; generates `theme.css` (web) and `theme.native.css` (native) |
+| `packages/core` | Platform-free data layer: Supabase client factory, React Query hooks, types, filters, `DB` types |
+| `apps/native` | Expo app for iOS and Android (see `native.md`) |
 
 ## Deployment
 

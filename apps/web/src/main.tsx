@@ -3,6 +3,7 @@ import { RouterProvider, createRouter } from "@tanstack/react-router";
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import "./index.css";
+import { WebPlaydaryProvider } from "./lib/playdary";
 import { applyStoredTheme } from "./lib/theme";
 import { routeTree } from "./routeTree.gen";
 
@@ -20,7 +21,9 @@ declare module "@tanstack/react-router" {
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <QueryClientProvider client={queryClient}>
-      <RouterProvider router={router} />
+      <WebPlaydaryProvider>
+        <RouterProvider router={router} />
+      </WebPlaydaryProvider>
     </QueryClientProvider>
   </StrictMode>,
 );

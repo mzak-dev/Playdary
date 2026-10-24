@@ -1,8 +1,8 @@
-import type { Game } from "@playdary/design-system";
 import type { Session } from "@supabase/supabase-js";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { GAME_COLUMNS, toGame, type GameRow } from "./games";
-import { supabase } from "./supabase";
+import { usePlaydary } from "./provider";
+import type { Game } from "./types";
 
 export type Privacy = "everyone" | "friends" | "private";
 export type Notifications = { friends: boolean; release: boolean; digest: boolean };
@@ -13,8 +13,9 @@ export type Profile = { username: string; privacy: Privacy; notifications: Notif
 
 const profileKey = (userId: string) => ["profile", userId];
 
-export const useProfile = (userId: string) =>
-  useQuery({
+export const useProfile = (userId: string) => {
+  const { supabase } = usePlaydary();
+  return useQuery({
     queryKey: profileKey(userId),
     staleTime: Infinity,
     queryFn: async (): Promise<Profile> => {
@@ -23,6 +24,7 @@ export const useProfile = (userId: string) =>
       return data as Profile;
     },
   });
+};
 
 export function useUsername(session: Session) {
   const { data } = useProfile(session.user.id);
@@ -30,6 +32,7 @@ export function useUsername(session: Session) {
 }
 
 export function useUpdateProfile(userId: string) {
+  const { supabase } = usePlaydary();
   const client = useQueryClient();
   const key = profileKey(userId);
 
@@ -57,8 +60,9 @@ const count = async (query: PromiseLike<{ count: number | null; error: { message
   return total ?? 0;
 };
 
-export const useProfileStats = (userId: string) =>
-  useQuery({
+export const useProfileStats = (userId: string) => {
+  const { supabase } = usePlaydary();
+  return useQuery({
     queryKey: ["profile-stats", userId],
     queryFn: async (): Promise<ProfileStats> => {
       const head = { count: "exact", head: true } as const;
@@ -71,11 +75,13 @@ export const useProfileStats = (userId: string) =>
       return { follows, rated, listed, friends };
     },
   });
+};
 
 export type RatedGame = { game: Game; score: number };
 
-export const useRatedGames = (userId: string) =>
-  useQuery({
+export const useRatedGames = (userId: string) => {
+  const { supabase } = usePlaydary();
+  return useQuery({
     queryKey: ["rated-games", userId],
     queryFn: async (): Promise<RatedGame[]> => {
       const { data, error } = await supabase.from("ratings").select(`score, games(${GAME_COLUMNS})`).eq("user_id", userId);
@@ -85,11 +91,13 @@ export const useRatedGames = (userId: string) =>
         .sort((a, b) => b.score - a.score || a.game.title.localeCompare(b.game.title, "pl"));
     },
   });
+};
 
 export type FriendProfile = { id: string; username: string };
 
-export const useMyFriends = (userId: string) =>
-  useQuery({
+export const useMyFriends = (userId: string) => {
+  const { supabase } = usePlaydary();
+  return useQuery({
     queryKey: ["my-friends", userId],
     queryFn: async (): Promise<FriendProfile[]> => {
       const { data, error } = await supabase
@@ -101,4 +109,5 @@ export const useMyFriends = (userId: string) =>
       return rows.map((row) => (row.user_id === userId ? row.recipient : row.requester)).sort((a, b) => a.username.localeCompare(b.username, "pl"));
     },
   });
+};
 

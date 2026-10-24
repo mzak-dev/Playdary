@@ -1,8 +1,7 @@
 import { ActivityItem, Avatar, Button, SegmentedControl, Skeleton } from "@playdary/design-system";
 import { useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
-import { PRIVACY, useProfile } from "../../lib/profile";
-import { relativeTime, useFriendActivity, useFriendCards, type FriendEvent } from "../../lib/friends";
+import { PRIVACY, useProfile, relativeTime, useFriendActivity, useFriendCards, type FriendEvent } from "@playdary/core";
 import { Panel, SectionHeading } from "../panel";
 
 const FILTERS = ["Wszystko", "Oceny", "Ukończone", "Obserwowane"] as const;

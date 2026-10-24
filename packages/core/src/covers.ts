@@ -1,8 +1,9 @@
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
-import { supabase } from "./supabase";
+import { usePlaydary } from "./provider";
 
 export function useRandomCovers(count = 28) {
+  const { supabase } = usePlaydary();
   const [draw] = useState(Math.random);
   const { data } = useQuery({
     queryKey: ["random-covers", draw],
