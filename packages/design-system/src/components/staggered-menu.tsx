@@ -57,7 +57,7 @@ export function StaggeredMenu({ open, onClose, links, active, onNavigate, query,
   return (
     <AnimatePresence>
       {open && (
-        <div className="fixed inset-0 z-[55] sm:hidden">
+        <div className="pointer-events-auto fixed inset-0 z-[55] sm:hidden">
           {LAYERS.map((layer) => (
             <motion.i key={layer.className} aria-hidden {...slide(layer.delay)} className={`fixed inset-y-0 right-0 w-[min(100vw,420px)] ${layer.className}`} />
           ))}
