@@ -2,7 +2,7 @@ import type { Friend, Game } from "@playdary/design-system";
 import { keepPreviousData, useInfiniteQuery, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { embedText } from "./embed";
 import { useServerEmbeddings } from "./embed-settings";
-import { toRpcParams, type Filters } from "./filters";
+import { DEFAULT_FILTERS, toRpcParams, type Filters, type TabLabel } from "./filters";
 import { polishTags } from "./labels";
 import { supabase } from "./supabase";
 
@@ -56,6 +56,16 @@ export const useTicker = () =>
     queryKey: ["games", "ticker"],
     staleTime: STALE_TIME,
     queryFn: async () => toGames(await games().gt("release_date", Date.now()).order("release_date").limit(20)),
+  });
+
+export const useShelf = (tab: TabLabel) =>
+  useQuery({
+    queryKey: ["games", "shelf", tab],
+    staleTime: STALE_TIME,
+    queryFn: async () => {
+      const { data, error } = await supabase.rpc("browse_games", { ...toRpcParams({ ...DEFAULT_FILTERS, tab }), p_limit: 5, p_offset: 0 });
+      return toGames({ data, error });
+    },
   });
 
 export const useBrowse = (filters: Filters) =>

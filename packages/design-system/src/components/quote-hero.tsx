@@ -6,11 +6,11 @@ import { PageHero } from "./page-hero";
 
 export type Quote = { text: string; game: string; year: number };
 
-type QuoteHeroProps = { user: string; quotes: Quote[]; interval?: number; onOpenGame?: () => void; children?: ReactNode };
+type QuoteHeroProps = { user: string; quotes: Quote[]; interval?: number; compact?: boolean; onOpenGame?: () => void; children?: ReactNode };
 
 const prefersReducedMotion = () => window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-export function QuoteHero({ user, quotes, interval = 9000, onOpenGame, children }: QuoteHeroProps) {
+export function QuoteHero({ user, quotes, interval = 9000, compact = false, onOpenGame, children }: QuoteHeroProps) {
   const [index, setIndex] = useState(0);
   const [paused, setPaused] = useState(false);
   const quoteRef = useRef<HTMLHeadingElement>(null);
@@ -49,7 +49,7 @@ export function QuoteHero({ user, quotes, interval = 9000, onOpenGame, children 
       onMouseLeave={() => setPaused(false)}
       onFocus={() => setPaused(true)}
       onBlur={() => setPaused(false)}
-      className="pb-[120px]"
+      className={compact ? "pb-[96px]" : "pb-[120px]"}
     >
       <>
         <span className="text-sm leading-5 font-medium text-muted-foreground">
@@ -58,7 +58,7 @@ export function QuoteHero({ user, quotes, interval = 9000, onOpenGame, children 
             {user}
           </strong>
         </span>
-        <h1 key={index} ref={quoteRef} aria-label={quote.text} className="max-w-[45ch] font-display text-[clamp(36px,9vw,56px)] leading-[1.04] font-extrabold tracking-tight">
+        <h1 key={index} ref={quoteRef} aria-label={quote.text} className={compact ? "max-w-[60ch] font-display text-[clamp(18px,4.6vw,24px)] leading-[1.25] font-bold tracking-tight" : "max-w-[45ch] font-display text-[clamp(36px,9vw,56px)] leading-[1.04] font-extrabold tracking-tight"}>
           {quote.text.split(" ").map((word, i) => (
             <Fragment key={i}>
               {i > 0 && " "}
@@ -72,16 +72,18 @@ export function QuoteHero({ user, quotes, interval = 9000, onOpenGame, children 
           <span className="inline-flex items-center gap-2.5 text-sm leading-5 font-semibold text-muted-foreground before:h-[3px] before:w-7 before:rounded-sm before:bg-foreground">
             {quote.game} · {quote.year}
           </span>
-          <Button variant="secondary" onClick={onOpenGame}>
-            Zobacz grę
-          </Button>
+          {!compact && (
+            <Button variant="secondary" onClick={onOpenGame}>
+              Zobacz grę
+            </Button>
+          )}
           {quotes.length > 1 && (
             <Button variant="ghost" size="sm" aria-label="Losuj cytat" title="Losuj cytat" onClick={showRandom} className="size-8 px-0 text-muted-foreground opacity-40 hover:opacity-100 focus-visible:opacity-100">
               <Shuffle size={16} aria-hidden />
             </Button>
           )}
         </div>
-        {children && <div className="mt-4 -mx-4 sm:-mx-8">{children}</div>}
+        {children && <div className={compact ? "flex min-w-0 flex-col gap-4" : "mt-4 -mx-4 sm:-mx-8"}>{children}</div>}
       </>
     </PageHero>
   );
