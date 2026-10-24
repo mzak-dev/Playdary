@@ -24,6 +24,7 @@
 - `nativewind-env.d.ts` is created by hand (`expo start` normally writes it) and declares `*.css` for the `global.css` import.
 - `tsc` passes with the root TypeScript 7.
 - SDK 58 pins `react 19.3.0` and `react-native 0.88.0`, and React Native needs the exact renderer match. The whole repo therefore uses `react 19.3.0` (web was on 19.3.1) and shared packages declare `react` as a peer dependency.
+- Tailwind only scans the app folder, so `global.css` has `@source "../../packages/design-system-native/src"`. Without it, classes used only inside the package (button background, input border) are silently missing.
 - Not verified in the build environment: running in Expo Go on a device. Do this first on a phone.
 
 ## Fonts
@@ -38,3 +39,14 @@ React Native has no variable-weight fonts. Each weight is its own family (`Sora_
 - React, `react-dom` and `@tanstack/react-query` come from the `catalog:` in `pnpm-workspace.yaml`, so the whole repo resolves one copy; two copies break React context in Metro.
 - Database types live in `packages/core/src/database.types.ts`; refresh with `pnpm --filter @playdary/backend db:types` (needs `supabase link`). Function return types are generated as non-null, so check nullable columns by hand.
 - Tokens: edit `packages/tokens/src/index.ts`, then `pnpm --filter @playdary/tokens build` rewrites both CSS files (committed, so dev servers need no build step).
+
+## Auth setup
+
+- Copy `apps/native/.env.example` to `apps/native/.env` and fill in the Supabase URL and anon key (same values as web).
+- Add these to Supabase Authentication, URL Configuration, Redirect URLs: `playdary://**` for builds and `exp://**` for Expo Go.
+- E-mail and password work in Expo Go. Google and Discord open the system browser and return through the redirect URL; test them in a dev client.
+- The session is stored in AsyncStorage and refreshed while the app is in the foreground. Sign-out clears the persisted query cache.
+
+## Visual check without a device
+
+Temporarily add `react-native-web` and `@expo/metro-runtime` to `apps/native`, set `expo.web.bundler` to `metro`, run `expo export --platform web` and open the result in a 390x844 browser. `Appearance.setColorScheme` does not exist there, so the theme switch needs the browser colour scheme emulated. Do not commit these changes.

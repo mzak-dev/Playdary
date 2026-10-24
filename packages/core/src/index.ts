@@ -2,6 +2,7 @@ export * from "./ai-stream";
 export * from "./client";
 export * from "./covers";
 export type { Database } from "./database.types";
+export type { Session } from "@supabase/supabase-js";
 export * from "./embedder";
 export * from "./filters";
 export * from "./format";
