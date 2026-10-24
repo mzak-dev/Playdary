@@ -20,6 +20,7 @@ type NavBarProps = {
   onSearch: (query: string) => void;
   onPick: (id: number) => void;
   onSubmitSearch: (query: string) => void;
+  locationKey: string;
   searching: boolean;
   serverEmbeddings: boolean;
   onServerEmbeddingsChange: (enabled: boolean) => void;
@@ -42,7 +43,7 @@ function useHiddenOnScrollDown() {
   return hidden;
 }
 
-export function NavBar({ user, links, active, onNavigate, suggestions, searching, onSearch, onPick, onSubmitSearch, serverEmbeddings, onServerEmbeddingsChange, onOpenProfile, onSignOut }: NavBarProps) {
+export function NavBar({ user, links, active, onNavigate, suggestions, searching, onSearch, onPick, onSubmitSearch, locationKey, serverEmbeddings, onServerEmbeddingsChange, onOpenProfile, onSignOut }: NavBarProps) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const menu = useRef<HTMLDivElement>(null);
@@ -69,6 +70,8 @@ export function NavBar({ user, links, active, onNavigate, suggestions, searching
     };
   }, [menuOpen]);
 
+  useEffect(() => setMobileOpen(false), [locationKey]);
+
   const closeSearch = () => {
     setSearchOpen(false);
     setQuery("");
@@ -83,13 +86,12 @@ export function NavBar({ user, links, active, onNavigate, suggestions, searching
   const submitSearch = () => {
     const submitted = query.trim();
     if (!submitted) return;
-    setMobileOpen(false);
-    closeSearch();
+    if (!mobileOpen) closeSearch();
     onSubmitSearch(submitted);
   };
 
   const mobileNavigate = (id: string) => {
-    setMobileOpen(false);
+    if (id === active) setMobileOpen(false);
     onNavigate(id);
   };
 
@@ -238,12 +240,10 @@ export function NavBar({ user, links, active, onNavigate, suggestions, searching
         onSubmitSearch={submitSearch}
         suggestions={suggestions}
         onPick={(id) => {
-          setMobileOpen(false);
-          closeSearch();
           onPick(id);
         }}
         shortcuts={[
-          { label: "Profil", onClick: () => { setMobileOpen(false); onOpenProfile(); } },
+          { label: "Profil", onClick: onOpenProfile },
           { label: "Wyloguj się", onClick: onSignOut },
         ]}
       />

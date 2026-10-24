@@ -1,6 +1,6 @@
 import { Footer, NavBar } from "@playdary/design-system";
 import type { Session } from "@supabase/supabase-js";
-import { useNavigate } from "@tanstack/react-router";
+import { useNavigate, useRouterState } from "@tanstack/react-router";
 import { useState, type ReactNode } from "react";
 import { AiChat } from "./ai-chat";
 import { useServerEmbeddings } from "../lib/embed-settings";
@@ -22,6 +22,7 @@ type AppShellProps = { session: Session; active?: string; children: ReactNode };
 
 export function AppShell({ session, active = "home", children }: AppShellProps) {
   const navigate = useNavigate();
+  const locationKey = useRouterState({ select: (state) => state.resolvedLocation?.href ?? "" });
   const user = useUsername(session);
   const [serverEmbeddings, setServerEmbeddings] = useServerEmbeddings();
   const [query, setQuery] = useState("");
@@ -47,6 +48,7 @@ export function AppShell({ session, active = "home", children }: AppShellProps) 
         searching={search.isFetching || trimmed !== debounced}
         onSearch={setQuery}
         onPick={(id) => navigate({ to: "/games/$gameId", params: { gameId: String(id) } })}
+        locationKey={locationKey}
         onSubmitSearch={(q) => navigate({ to: "/search", search: { q } })}
         serverEmbeddings={serverEmbeddings}
         onServerEmbeddingsChange={setServerEmbeddings}
