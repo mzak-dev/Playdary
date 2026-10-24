@@ -47,6 +47,7 @@ export function AppShell({ session, active = "home", children }: AppShellProps) 
         searching={search.isFetching || trimmed !== debounced}
         onSearch={setQuery}
         onPick={(id) => navigate({ to: "/games/$gameId", params: { gameId: String(id) } })}
+        onSubmitSearch={(q) => navigate({ to: "/search", search: { q } })}
         serverEmbeddings={serverEmbeddings}
         onServerEmbeddingsChange={setServerEmbeddings}
         onOpenProfile={() => navigate({ to: "/profile" })}

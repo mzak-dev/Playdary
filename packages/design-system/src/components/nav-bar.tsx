@@ -1,4 +1,4 @@
-import { Bell, Search, X } from "lucide-react";
+import { Bell, Menu, Search, X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import logo from "../assets/logo.png";
 import { cn } from "../lib/cn";
@@ -6,6 +6,7 @@ import type { Game } from "../types";
 import { Avatar } from "./avatar";
 import { GameCover } from "./game-cover";
 import { Skeleton } from "./skeleton";
+import { StaggeredMenu } from "./staggered-menu";
 import { Switch } from "./switch";
 
 type NavLink = { id: string; label: string; short: string; badge?: number };
@@ -18,6 +19,7 @@ type NavBarProps = {
   suggestions: Game[];
   onSearch: (query: string) => void;
   onPick: (id: number) => void;
+  onSubmitSearch: (query: string) => void;
   searching: boolean;
   serverEmbeddings: boolean;
   onServerEmbeddingsChange: (enabled: boolean) => void;
@@ -40,8 +42,9 @@ function useHiddenOnScrollDown() {
   return hidden;
 }
 
-export function NavBar({ user, links, active, onNavigate, suggestions, searching, onSearch, onPick, serverEmbeddings, onServerEmbeddingsChange, onOpenProfile, onSignOut }: NavBarProps) {
+export function NavBar({ user, links, active, onNavigate, suggestions, searching, onSearch, onPick, onSubmitSearch, serverEmbeddings, onServerEmbeddingsChange, onOpenProfile, onSignOut }: NavBarProps) {
   const [menuOpen, setMenuOpen] = useState(false);
+  const [mobileOpen, setMobileOpen] = useState(false);
   const menu = useRef<HTMLDivElement>(null);
   const [searchOpen, setSearchOpen] = useState(false);
   const [query, setQuery] = useState("");
@@ -72,6 +75,24 @@ export function NavBar({ user, links, active, onNavigate, suggestions, searching
     onSearch("");
   };
 
+  const changeQuery = (value: string) => {
+    setQuery(value);
+    onSearch(value);
+  };
+
+  const submitSearch = () => {
+    const submitted = query.trim();
+    if (!submitted) return;
+    setMobileOpen(false);
+    closeSearch();
+    onSubmitSearch(submitted);
+  };
+
+  const mobileNavigate = (id: string) => {
+    setMobileOpen(false);
+    onNavigate(id);
+  };
+
   return (
     <div className={cn("pointer-events-none sticky top-0 z-50 flex justify-center px-4 pt-3 transition duration-500 sm:px-8", hidden && "-translate-y-[90px] opacity-0")}>
       <nav aria-label="Główna" className="pointer-events-auto relative flex max-w-full items-center gap-2 rounded-full bg-secondary py-2 pr-2 pl-[18px] shadow-pop">
@@ -80,7 +101,7 @@ export function NavBar({ user, links, active, onNavigate, suggestions, searching
           <span aria-hidden className="hidden sm:inline">Playdary</span>
         </div>
 
-        <div className={cn("relative grid overflow-hidden rounded-full transition-[width,opacity] duration-[400ms]", searchOpen ? "invisible w-0 opacity-0" : "w-[204px] sm:w-[330px]")} style={{ gridTemplateColumns: `repeat(${links.length}, 1fr)` }}>
+        <div className={cn("relative hidden overflow-hidden rounded-full transition-[width,opacity] duration-[400ms] sm:grid", searchOpen ? "invisible w-0 opacity-0" : "w-[330px]")} style={{ gridTemplateColumns: `repeat(${links.length}, 1fr)` }}>
           <span
             aria-hidden
             className={cn("absolute inset-y-0 left-0 rounded-full bg-accent transition-transform duration-[450ms] ease-[cubic-bezier(0.3,1.25,0.5,1)]", activeIndex < 0 && "invisible")}
@@ -101,7 +122,7 @@ export function NavBar({ user, links, active, onNavigate, suggestions, searching
           ))}
         </div>
 
-        <div className="relative flex">
+        <div className="relative hidden sm:flex">
           <div className={cn("flex h-10 items-center overflow-hidden rounded-full transition-[width,background] duration-[450ms]", searchOpen ? "w-[min(320px,calc(100vw-190px))] bg-background focus-within:shadow-[inset_0_0_0_1.5px_var(--primary)]" : "w-10")}>
             <button type="button" aria-label="Szukaj gier" aria-expanded={searchOpen} onClick={() => setSearchOpen(true)} className="grid size-10 shrink-0 place-items-center rounded-full hover:bg-accent">
               <Search aria-hidden className="size-5" />
@@ -119,11 +140,11 @@ export function NavBar({ user, links, active, onNavigate, suggestions, searching
                   enterKeyHint="search"
                   placeholder="Szukaj gier…"
                   aria-label="Szukaj gier"
-                  onChange={(e) => {
-                    setQuery(e.target.value);
-                    onSearch(e.target.value);
+                  onChange={(e) => changeQuery(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Escape") closeSearch();
+                    if (e.key === "Enter") submitSearch();
                   }}
-                  onKeyDown={(e) => e.key === "Escape" && closeSearch()}
                   className="h-10 min-w-0 flex-1 appearance-none bg-transparent px-1 text-base font-medium outline-none sm:text-sm [&::-webkit-search-cancel-button]:hidden placeholder:text-muted-foreground"
                 />
                 <button type="button" aria-label="Zamknij wyszukiwarkę" onClick={closeSearch} className="grid size-10 shrink-0 place-items-center rounded-full hover:bg-accent">
@@ -162,6 +183,10 @@ export function NavBar({ user, links, active, onNavigate, suggestions, searching
                   </span>
                 </button>
               ))}
+              <button type="button" onClick={submitSearch} className="mt-1 flex w-full items-center justify-between gap-3 rounded-[10px] border-t border-border px-3 py-2.5 text-left text-sm font-semibold text-primary hover:bg-accent">
+                <span className="truncate">Pokaż wszystkie wyniki dla „{query.trim()}”</span>
+                <kbd className="rounded-md bg-secondary px-2 py-0.5 font-sans text-[11px] leading-4 font-semibold text-muted-foreground">Enter</kbd>
+              </button>
             </div>
           )}
         </div>
@@ -170,7 +195,7 @@ export function NavBar({ user, links, active, onNavigate, suggestions, searching
           <Bell aria-hidden className="size-5" />
           <span className="absolute top-[7px] right-[7px] size-2.5 rounded-full bg-primary ring-2 ring-secondary" />
         </button>
-        <div ref={menu} className="relative">
+        <div ref={menu} className="relative hidden sm:block">
           <button
             type="button"
             aria-label={`Profil: ${user}`}
@@ -197,7 +222,31 @@ export function NavBar({ user, links, active, onNavigate, suggestions, searching
             </div>
           )}
         </div>
+        <button type="button" aria-label="Menu" aria-expanded={mobileOpen} onClick={() => setMobileOpen(true)} className="ml-auto inline-flex h-10 items-center gap-2 rounded-full pr-2 pl-3 text-sm font-bold hover:bg-accent sm:hidden">
+          Menu
+          <Menu aria-hidden className="size-5" />
+        </button>
       </nav>
+      <StaggeredMenu
+        open={mobileOpen}
+        onClose={() => setMobileOpen(false)}
+        links={links}
+        active={active}
+        onNavigate={mobileNavigate}
+        query={query}
+        onQueryChange={changeQuery}
+        onSubmitSearch={submitSearch}
+        suggestions={suggestions}
+        onPick={(id) => {
+          setMobileOpen(false);
+          closeSearch();
+          onPick(id);
+        }}
+        shortcuts={[
+          { label: "Profil", onClick: () => { setMobileOpen(false); onOpenProfile(); } },
+          { label: "Wyloguj się", onClick: onSignOut },
+        ]}
+      />
     </div>
   );
 }

@@ -240,6 +240,26 @@ export const useSearch = (query: string) => {
   });
 };
 
+const RESULTS_LIMIT = 60;
+
+export const useSearchResults = (query: string) => {
+  const embedding = useQueryEmbedding(query).data ?? null;
+
+  return useQuery({
+    queryKey: ["games", "search-results", query, embedding !== null],
+    enabled: query.length > 1,
+    staleTime: STALE_TIME,
+    placeholderData: keepPreviousData,
+    queryFn: async (): Promise<Game[]> => {
+      const ranked = await supabase.rpc("search_games", { q: query, q_embedding: embedding, lim: RESULTS_LIMIT });
+      if (ranked.error) throw new Error(ranked.error.message);
+      const ids = (ranked.data as SearchRow[]).map((row) => row.id);
+      const found = toGames(await games().in("id", ids));
+      return ids.flatMap((id) => found.filter((game) => game.id === id));
+    },
+  });
+};
+
 type FriendRow = { game_id: number; username: string; kind: Friend["kind"]; score: number | null };
 
 export const useFriends = (gameIds: number[]) =>
