@@ -1,8 +1,10 @@
 import { useTokenColor } from "@playdary/design-system-native";
 import { Tabs } from "expo-router";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { House, Library, Search, User, Users } from "lucide-react-native";
 
 export default function TabsLayout() {
+  const insets = useSafeAreaInsets();
   const background = useTokenColor("card");
   const border = useTokenColor("border");
   const active = useTokenColor("primary");
@@ -14,7 +16,7 @@ export default function TabsLayout() {
         headerShown: false,
         tabBarActiveTintColor: active,
         tabBarInactiveTintColor: inactive,
-        tabBarStyle: { backgroundColor: background, borderTopColor: border },
+        tabBarStyle: { backgroundColor: background, borderTopColor: border, height: 58 + insets.bottom, paddingTop: 6, paddingBottom: insets.bottom + 4 },
         tabBarLabelStyle: { fontFamily: "DMSans_600SemiBold", fontSize: 11 },
       }}
     >
