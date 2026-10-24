@@ -10,7 +10,8 @@ import { useEffect, useState } from "react";
 import { AppState, Text, View } from "react-native";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { isConfigured } from "../lib/env";
-import { CACHE_MAX_AGE, persister, queryClient } from "../lib/query";
+import { ChatProvider } from "../lib/chat";
+import { CACHE_MAX_AGE, persister, queryClient, shouldPersistQuery } from "../lib/query";
 import { SessionProvider, useSession } from "../lib/session";
 import { applyStoredTheme, useOnboarded, useTheme } from "../lib/settings";
 import { hydrateStorage } from "../lib/storage";
@@ -47,6 +48,7 @@ function Navigator() {
           <Stack.Screen name="(tabs)" />
           <Stack.Screen name="games/[gameId]" />
           <Stack.Screen name="u/[username]" />
+          <Stack.Screen name="chat" options={{ presentation: "modal" }} />
         </Stack.Protected>
         <Stack.Protected guard={!session && !onboarded}>
           <Stack.Screen name="onboarding" />
@@ -83,10 +85,12 @@ export default function RootLayout() {
 
   return (
     <SafeAreaProvider>
-      <PersistQueryClientProvider client={queryClient} persistOptions={{ persister, maxAge: CACHE_MAX_AGE, buster: "v1" }}>
+      <PersistQueryClientProvider client={queryClient} persistOptions={{ persister, maxAge: CACHE_MAX_AGE, buster: "v2", dehydrateOptions: { shouldDehydrateQuery: shouldPersistQuery } }}>
         <PlaydaryProvider supabase={supabase} embedder={embedder}>
           <SessionProvider>
-            <Navigator />
+            <ChatProvider>
+              <Navigator />
+            </ChatProvider>
           </SessionProvider>
         </PlaydaryProvider>
       </PersistQueryClientProvider>

@@ -139,7 +139,7 @@ export default function Home() {
         renderItem={({ item }) => <View className="px-4 pb-6">{card(item)}</View>}
         ListHeaderComponent={header}
         ListFooterComponent={
-          <View className="items-center gap-6 px-4 pb-10">
+          <View className="items-center gap-6 px-4 pb-28">
             {browse.isFetchingNextPage && skeletons(1, "w-full")}
             {browse.hasNextPage && !browse.isFetchingNextPage && (
               <Button variant="secondary" onPress={() => browse.fetchNextPage()}>

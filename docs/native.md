@@ -15,7 +15,7 @@
 - Components live in `packages/design-system-native`, mirroring the web component names, props and `cva` variants.
 - Tokens come from one source in `packages/tokens`; web and native both consume the generated `theme.css`.
 - Query embeddings always go through the `embed-query` Edge Function on native.
-- AI chat is out of the first release.
+- AI chat is a modal opened from the floating "Zapytaj AI" button; see `ai-chat.md`.
 
 ## Spike findings (SDK 58, NativeWind 5.0.0-rc.0)
 
@@ -38,6 +38,7 @@ React Native has no variable-weight fonts. Each weight is its own family (`Sora_
 - `Embedder` is chosen per app: web switches between the Web Worker and `createServerEmbedder`, native uses only the server one.
 - React, `react-dom` and `@tanstack/react-query` come from the `catalog:` in `pnpm-workspace.yaml`, so the whole repo resolves one copy; two copies break React context in Metro.
 - Database types live in `packages/core/src/database.types.ts`; refresh with `pnpm --filter @playdary/backend db:types` (needs `supabase link`). Function return types are generated as non-null, so check nullable columns by hand.
+- `packages/core` includes `@types/node` for `AbortController`, so `window` and `document` are still rejected but `localStorage` is not. Keep storage access behind `KeyValueStorage`.
 - Tokens: edit `packages/tokens/src/index.ts`, then `pnpm --filter @playdary/tokens build` rewrites both CSS files (committed, so dev servers need no build step).
 
 ## Auth setup
@@ -46,6 +47,7 @@ React Native has no variable-weight fonts. Each weight is its own family (`Sora_
 - Add these to Supabase Authentication, URL Configuration, Redirect URLs: `playdary://**` for builds and `exp://**` for Expo Go.
 - E-mail and password work in Expo Go. Google and Discord open the system browser and return through the redirect URL; test them in a dev client.
 - The session is stored in AsyncStorage and refreshed while the app is in the foreground. Sign-out clears the persisted query cache.
+- The query cache is persisted as JSON, so queries that return a `Set` (`useFollows`, `useExistingGameIds`) are excluded in `lib/query.ts`. Persisting them made the app crash on the next launch.
 
 ## Browser preview
 
@@ -55,6 +57,6 @@ React Native has no variable-weight fonts. Each weight is its own family (`Sora_
 
 - Onboarding: five swipeable slides (search, rate, lists, friends, AI assistant), shown once; the flag lives in `playdary:onboarded`.
 - Tabs: Start, Szukaj, Listy, Znajomi, Profil. Outside the tabs: `games/[gameId]` and `u/[username]`.
-- Not built yet: the AI chat itself. Slide five only announces it.
+- AI chat: modal route `chat`, entry button on every tab, "Zapytaj o tę grę" on the game page.
 - Trailers use `react-native-youtube-iframe` on devices and a plain iframe in the browser preview.
 - Set `EXPO_PUBLIC_WEB_URL` to the web app address so invite links open there; without it they use the app's deep link.

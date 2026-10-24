@@ -14,11 +14,12 @@ import {
 } from "@playdary/core";
 import { Button, Countdown, FriendNotice, Gallery, GameCover, GameRow, ListButton, Rating, ScoreBadge, Skeleton, StatTile, Tag, useTokenColor, type Slide } from "@playdary/design-system-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import { ArrowLeft, Check, Eye } from "lucide-react-native";
+import { ArrowLeft, Check, Eye, Sparkles } from "lucide-react-native";
 import { useRef, type ComponentRef } from "react";
 import { Pressable, ScrollView, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { AgeRatings, Label, Languages, Links, Multiplayer, PcRequirements, Related, Releases, SectionTitle, TimeToBeat } from "../../components/game-sections";
+import { gamePrompt } from "../../components/chat/text";
 import { useRequiredSession } from "../../lib/session";
 
 const buildSlides = ({ game, screenshots, videos }: GameDetail): Slide[] => {
@@ -132,6 +133,10 @@ export default function GamePage() {
                 {following ? "Obserwujesz" : "Obserwuj"}
               </Button>
               <ListButton size="md" value={lists.data?.[gameId] ?? null} onChange={(list) => setList.mutate({ gameId, list })} />
+              <Button variant="secondary" onPress={() => router.push({ pathname: "/chat", params: { prompt: gamePrompt(data.game.title) } })}>
+                <Sparkles color={foreground} size={18} />
+                Zapytaj o tę grę
+              </Button>
             </View>
 
             {details && <TimeToBeat data={details.timeToBeat} />}

@@ -117,7 +117,7 @@ export default function Search() {
         keyExtractor={(game) => String(game.id)}
         keyboardShouldPersistTaps="handled"
         ListHeaderComponent={header}
-        ListFooterComponent={<View className="h-6" />}
+        ListFooterComponent={<View className="h-24" />}
         renderItem={({ item }) => (
           <View className="px-4 pb-6">
             <GameCard

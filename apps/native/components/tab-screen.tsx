@@ -8,7 +8,7 @@ type TabScreenProps = { title: string; hero?: ReactNode; children?: ReactNode };
 export function TabScreen({ title, hero, children }: TabScreenProps) {
   const insets = useSafeAreaInsets();
   return (
-    <ScrollView className="flex-1 bg-background" contentContainerClassName="pb-10" keyboardShouldPersistTaps="handled">
+    <ScrollView className="flex-1 bg-background" contentContainerClassName="pb-28" keyboardShouldPersistTaps="handled">
       <View style={{ paddingTop: insets.top }}>
         <PageHero>
           <Text accessibilityRole="header" className="font-display-extrabold text-[36px] leading-[40px] tracking-tight text-foreground">
