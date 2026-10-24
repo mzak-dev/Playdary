@@ -1,5 +1,5 @@
 import { cn } from "../lib/cn";
-import { igdbImage } from "../lib/igdb-image";
+import { igdbImage } from "@playdary/core";
 
 const TONES = ["bg-cover-ember", "bg-cover-teal", "bg-cover-rose", "bg-cover-lime", "bg-cover-sky"];
 

@@ -1,7 +1,6 @@
 import { Button, Skeleton, TextField, UserRow } from "@playdary/design-system";
 import { useState } from "react";
-import { mutualLabel, useSearchUsers } from "../../lib/friends";
-import { useProfile } from "../../lib/profile";
+import { mutualLabel, useSearchUsers, useProfile } from "@playdary/core";
 import { useDebounced } from "../../lib/use-debounced";
 import { Panel, SectionHeading } from "../panel";
 import { UserActions } from "../user-actions";

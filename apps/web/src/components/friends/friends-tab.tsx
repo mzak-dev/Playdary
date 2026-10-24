@@ -1,7 +1,7 @@
 import { ActivityItem, Avatar, Button, MatchMeter, MatchRing, Skeleton, StatTile, Switch, TextField } from "@playdary/design-system";
 import { useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
-import { relativeTime, useFriendAction, useFriendCards, useFriendDetail, type FriendCard } from "../../lib/friends";
+import { relativeTime, useFriendAction, useFriendCards, useFriendDetail, type FriendCard } from "@playdary/core";
 import { Panel } from "../panel";
 
 const sinceLabel = (since: number) => new Date(since).toLocaleDateString("pl-PL", { day: "numeric", month: "long", year: "numeric" });

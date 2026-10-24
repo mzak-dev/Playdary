@@ -1,9 +1,8 @@
 import { cn } from "../lib/cn";
+import type { ActivityKind } from "../types";
 import { Avatar } from "./avatar";
 import { CountUp } from "./count-up";
 import { GameCover } from "./game-cover";
-
-export type ActivityKind = "rated" | "done" | "follow" | "wish";
 
 type ActivityItemProps = {
   name: string;

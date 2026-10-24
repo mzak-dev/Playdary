@@ -1,5 +1,4 @@
-import { readServerEmbeddings } from "./embed-settings";
-import { supabase } from "./supabase";
+import type { Embedder } from "@playdary/core";
 
 type Pending = { resolve: (vector: number[]) => void; reject: (error: Error) => void };
 
@@ -27,10 +26,4 @@ const embedOnDevice = (text: string) =>
     getWorker().postMessage({ id, text });
   });
 
-const embedOnServer = async (text: string) => {
-  const { data, error } = await supabase.functions.invoke<{ vector: number[] }>("embed-query", { body: { text } });
-  if (error || !data) throw new Error(error?.message ?? "Brak wektora");
-  return data.vector;
-};
-
-export const embedText = (text: string) => (readServerEmbeddings() ? embedOnServer(text) : embedOnDevice(text));
+export const deviceEmbedder: Embedder = { id: "device", embed: embedOnDevice };

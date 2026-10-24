@@ -1,7 +1,6 @@
 import { RatedGameRow, Skeleton } from "@playdary/design-system";
 import { useNavigate } from "@tanstack/react-router";
-import { useSetList, useUserLists } from "../../lib/library";
-import { useRatedGames } from "../../lib/profile";
+import { useSetList, useUserLists, useRatedGames } from "@playdary/core";
 
 export function Ratings({ userId }: { userId: string }) {
   const navigate = useNavigate();

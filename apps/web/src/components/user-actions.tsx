@@ -1,5 +1,5 @@
 import { Button, Tag } from "@playdary/design-system";
-import { useFriendAction, type FoundUser } from "../lib/friends";
+import { useFriendAction, type FoundUser } from "@playdary/core";
 
 export function UserActions({ userId, user }: { userId: string; user: FoundUser }) {
   const action = useFriendAction(userId);

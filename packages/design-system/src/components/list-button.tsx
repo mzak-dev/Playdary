@@ -1,14 +1,8 @@
 import { Check, Plus } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
+import { LISTS } from "@playdary/core";
 import type { GameList } from "../types";
 import { Button } from "./button";
-
-export const LISTS: { id: GameList; label: string }[] = [
-  { id: "playing", label: "Gram" },
-  { id: "wishlist", label: "Chcę zagrać" },
-  { id: "done", label: "Ukończone" },
-  { id: "dropped", label: "Porzucone" },
-];
 
 type ListButtonProps = { value: GameList | null; onChange?: (value: GameList | null) => void; size?: "sm" | "md" };
 

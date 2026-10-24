@@ -3,8 +3,7 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { AppShell } from "../components/app-shell";
 import { UserActions } from "../components/user-actions";
 import { requireSession } from "../lib/auth";
-import { mutualLabel, useSearchUsers } from "../lib/friends";
-import { useProfile } from "../lib/profile";
+import { mutualLabel, useSearchUsers, useProfile } from "@playdary/core";
 
 export const Route = createFileRoute("/u/$username")({
   beforeLoad: async () => ({ session: await requireSession() }),

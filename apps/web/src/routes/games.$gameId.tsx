@@ -3,11 +3,9 @@ import { createFileRoute, useNavigate, useRouter } from "@tanstack/react-router"
 import { ArrowLeft, Check, Eye } from "lucide-react";
 import { AppShell } from "../components/app-shell";
 import { AgeRatings, Languages, Links, Multiplayer, PcRequirements, Related, Releases, TimeToBeat } from "../components/game-sections";
-import { tr } from "../lib/labels";
+import { tr, useFollows, useFriends, useGame, useSimilar, useToggleFollow, type GameDetail, useMyRating, useSetList, useSetRating, useUserLists } from "@playdary/core";
 import { requireSession } from "../lib/auth";
-import { useFollows, useFriends, useGame, useSimilar, useToggleFollow, type GameDetail } from "../lib/games";
 import { useActiveSection } from "../lib/use-active-section";
-import { useMyRating, useSetList, useSetRating, useUserLists } from "../lib/library";
 
 export const Route = createFileRoute("/games/$gameId")({
   beforeLoad: async () => ({ session: await requireSession() }),

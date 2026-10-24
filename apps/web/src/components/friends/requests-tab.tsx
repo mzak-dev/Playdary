@@ -1,5 +1,5 @@
 import { Button, Skeleton, UserRow } from "@playdary/design-system";
-import { mutualLabel, relativeTime, useFriendAction, useFriendRequests, type FriendRequest } from "../../lib/friends";
+import { mutualLabel, relativeTime, useFriendAction, useFriendRequests, type FriendRequest } from "@playdary/core";
 import { SectionHeading } from "../panel";
 
 const subtitle = (request: FriendRequest) => (request.mutual > 0 ? mutualLabel(request.mutual) : relativeTime(request.createdAt));

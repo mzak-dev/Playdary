@@ -2,9 +2,8 @@ import { animate, stagger } from "animejs";
 import { Shuffle } from "lucide-react";
 import { Fragment, useEffect, useRef, useState, type ReactNode } from "react";
 import { Button } from "./button";
+import type { Quote } from "../types";
 import { PageHero } from "./page-hero";
-
-export type Quote = { text: string; game: string; year: number };
 
 type QuoteHeroProps = { user: string; quotes: Quote[]; interval?: number; onOpenGame?: () => void; children?: ReactNode };
 

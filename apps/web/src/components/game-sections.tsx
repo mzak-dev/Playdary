@@ -1,8 +1,7 @@
 import { GameCover, Skeleton, StatTile, Tag } from "@playdary/design-system";
 import { ArrowUpRight } from "lucide-react";
 import type { ReactNode } from "react";
-import { useExistingGameIds, useRequirements, type Details } from "../lib/games";
-import { AGE_ORGANIZATIONS, AGE_RATINGS, REGIONS, RELEASE_STATUSES, ageDescriptor } from "../lib/labels";
+import { useExistingGameIds, useRequirements, type Details, AGE_ORGANIZATIONS, AGE_RATINGS, REGIONS, RELEASE_STATUSES, ageDescriptor } from "@playdary/core";
 
 export const SectionTitle = ({ children, large }: { children: ReactNode; large?: boolean }) => (
   <h2 className={large ? "font-display text-[28px] leading-[34px] font-bold tracking-tight" : "font-display text-xl leading-[26px] font-bold"}>{children}</h2>

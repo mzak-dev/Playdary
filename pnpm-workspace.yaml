@@ -4,3 +4,8 @@ packages:
 onlyBuiltDependencies:
   - esbuild
   - supabase
+catalog:
+  react: 19.3.0
+  react-dom: 19.3.0
+  "@tanstack/react-query": ^5.104.5
+  react-native: 0.88.0

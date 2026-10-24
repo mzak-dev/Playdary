@@ -8,6 +8,7 @@
     "stop": "supabase stop",
     "db:reset": "supabase db reset",
     "db:new": "supabase migration new",
+    "db:types": "supabase gen types typescript --linked > ../../packages/core/src/database.types.ts",
     "seed": "tsx --env-file=.env scripts/seed-igdb.ts",
     "typecheck": "tsc",
     "test": "tsx --test tests/*.test.ts"

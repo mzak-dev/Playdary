@@ -1,0 +1,49 @@
+{
+  "name": "@playdary/design-system-native",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./fonts": "./src/fonts.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc"
+  },
+  "dependencies": {
+    "@expo-google-fonts/dm-sans": "^0.4.2",
+    "@expo-google-fonts/sora": "^0.4.2",
+    "@playdary/core": "workspace:^",
+    "@playdary/tokens": "workspace:^",
+    "@ronradtke/react-native-markdown-display": "^9.0.3",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
+    "tailwind-merge": "^3.7.0"
+  },
+  "peerDependencies": {
+    "expo-image": "*",
+    "expo-linear-gradient": "*",
+    "lucide-react-native": "*",
+    "nativewind": ">=5.0.0-rc.0",
+    "react": ">=19",
+    "react-native": ">=0.81",
+    "react-native-safe-area-context": "*",
+    "react-native-svg": "*",
+    "react-native-webview": "*",
+    "react-native-youtube-iframe": "*"
+  },
+  "devDependencies": {
+    "@types/react": "^19.3.0",
+    "expo-image": "~58.0.17",
+    "expo-linear-gradient": "~58.0.3",
+    "lucide-react-native": "^1.61.0",
+    "nativewind": "5.0.0-rc.0",
+    "react": "catalog:",
+    "react-native": "catalog:",
+    "react-native-css": "3.1.0-rc.0",
+    "react-native-safe-area-context": "~5.10.1",
+    "react-native-svg": "15.16.0",
+    "react-native-webview": "14.0.1",
+    "react-native-youtube-iframe": "^2.4.1"
+  }
+}
