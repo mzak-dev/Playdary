@@ -3,6 +3,7 @@ export { useTokenColor } from "./lib/use-token-color";
 export { ActivityItem } from "./components/activity-item";
 export { Avatar } from "./components/avatar";
 export { Button, type ButtonProps } from "./components/button";
+export { ChatMarkdown } from "./components/chat-markdown";
 export { Chip } from "./components/chip";
 export { Countdown } from "./components/countdown";
 export { EmptyState } from "./components/empty-state";
