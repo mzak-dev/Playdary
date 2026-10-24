@@ -1,4 +1,4 @@
-import { NavBar } from "@playdary/design-system";
+import { Footer, NavBar } from "@playdary/design-system";
 import type { Session } from "@supabase/supabase-js";
 import { useNavigate } from "@tanstack/react-router";
 import { useState, type ReactNode } from "react";
@@ -53,6 +53,7 @@ export function AppShell({ session, active = "home", children }: AppShellProps) 
         onSignOut={signOut}
       />
       {children}
+      <Footer />
       <AiChat />
     </div>
   );
