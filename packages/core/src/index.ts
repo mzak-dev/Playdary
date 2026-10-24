@@ -1,3 +1,4 @@
+export * from "./ai-chat";
 export * from "./ai-stream";
 export * from "./client";
 export * from "./covers";
