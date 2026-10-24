@@ -27,6 +27,12 @@ Source: the Plogamer design system artifact. Tokens live in `packages/design-sys
 
 ## Profile
 
-- `/profile` has two sections: Przegląd (own ratings, friends) and Ustawienia (account, theme, notifications, privacy).
+- `/profile` has three sections: Przegląd (taste histogram, shelf, genres, friends), Oceny (all ratings) and Ustawienia (account, theme, notifications, privacy).
+- Level, XP and achievements from the prototype are not built; they need backend data.
 - `profiles.privacy` and `profiles.notifications` are stored but not enforced yet; enforcement arrives with the friends system.
 - Theme choice lives in `localStorage` (`playdary:theme`) and toggles the `light` class on `html`.
+
+## Search and mobile menu
+
+- Enter in the nav search opens `/search?q=`; results come from `search_games` (60 rows) and are filtered and sorted on the client.
+- Below `sm` the nav collapses to a Menu button that opens the staggered panel (links, search, shortcuts).

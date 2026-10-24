@@ -1,4 +1,4 @@
-import { PageHero, SegmentedControl, Tag } from "@playdary/design-system";
+import { Avatar, PageHero, SegmentedControl, Tag } from "@playdary/design-system";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { AppShell } from "../components/app-shell";
 import { ActivityTab } from "../components/friends/activity-tab";
@@ -6,7 +6,7 @@ import { AddTab } from "../components/friends/add-tab";
 import { FriendsTab } from "../components/friends/friends-tab";
 import { RequestsTab } from "../components/friends/requests-tab";
 import { requireSession } from "../lib/auth";
-import { friendsCount, useFriendRequests } from "../lib/friends";
+import { friendsCount, useFriendCards, useFriendRequests } from "../lib/friends";
 import { useProfileStats } from "../lib/profile";
 
 const TABS = ["Aktywność", "Znajomi", "Zaproszenia", "Dodaj"] as const;
@@ -24,6 +24,8 @@ function Friends() {
   const navigate = useNavigate({ from: Route.fullPath });
   const userId = session.user.id;
   const stats = useProfileStats(userId);
+  const cards = useFriendCards().data ?? [];
+  const playingNow = cards.filter((card) => card.playing);
   const incoming = (useFriendRequests().data ?? []).filter((request) => request.direction === "incoming").length;
   const tabLabel = (item: Tab) => (item === "Zaproszenia" && incoming > 0 ? `Zaproszenia · ${incoming}` : item);
   const labels = TABS.map(tabLabel);
@@ -33,9 +35,20 @@ function Friends() {
       <PageHero className="pb-[104px]">
         <div className="flex flex-wrap items-center gap-x-6 gap-y-4">
           <h1 className="font-display text-[clamp(32px,8vw,48px)] leading-[1.05] font-extrabold tracking-tight">Znajomi</h1>
-          <div className="flex flex-wrap gap-2">
+          {cards.length > 0 && (
+            <div className="flex -space-x-2">
+              {cards.slice(0, 5).map((card) => (
+                <Avatar key={card.id} name={card.username} status={card.playing ? "playing" : undefined} className="ring-2 ring-background" />
+              ))}
+            </div>
+          )}
+          <div className="flex flex-wrap items-center gap-2">
             {stats.data && <Tag>{friendsCount(stats.data.friends)}</Tag>}
             <Tag>Zaproszenia · {incoming}</Tag>
+            <span className="inline-flex items-center gap-2 text-sm font-medium text-muted-foreground">
+              <i aria-hidden className={`size-2 rounded-full ${playingNow.length ? "bg-success" : "bg-muted-foreground"}`} />
+              {playingNow.length ? `${playingNow.length} gra teraz` : "Nikt teraz nie gra"}
+            </span>
           </div>
         </div>
         <div>
