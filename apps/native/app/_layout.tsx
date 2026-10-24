@@ -45,6 +45,7 @@ function Navigator() {
       <Stack screenOptions={{ headerShown: false }}>
         <Stack.Protected guard={Boolean(session)}>
           <Stack.Screen name="(tabs)" />
+          <Stack.Screen name="games/[gameId]" />
         </Stack.Protected>
         <Stack.Protected guard={!session && !onboarded}>
           <Stack.Screen name="onboarding" />

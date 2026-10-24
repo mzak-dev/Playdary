@@ -9,6 +9,7 @@ export { EmptyState } from "./components/empty-state";
 export { FriendNotice } from "./components/friend-notice";
 export { GameCard } from "./components/game-card";
 export { GameCardSkeleton } from "./components/game-card-skeleton";
+export { Gallery, type Slide } from "./components/gallery";
 export { GameCover } from "./components/game-cover";
 export { GameRow } from "./components/game-row";
 export { ListButton } from "./components/list-button";
