@@ -28,6 +28,18 @@ type NavBarProps = {
   onSignOut: () => void;
 };
 
+let lastShownIndex = -1;
+
+function useSlidingIndex(target: number) {
+  const [shown, setShown] = useState(lastShownIndex < 0 ? target : lastShownIndex);
+  useEffect(() => {
+    const frame = requestAnimationFrame(() => setShown(target));
+    lastShownIndex = target;
+    return () => cancelAnimationFrame(frame);
+  }, [target]);
+  return shown;
+}
+
 function useHiddenOnScrollDown() {
   const [hidden, setHidden] = useState(false);
   useEffect(() => {
@@ -52,6 +64,7 @@ export function NavBar({ user, links, active, onNavigate, suggestions, searching
   const input = useRef<HTMLInputElement>(null);
   const hidden = useHiddenOnScrollDown() && !searchOpen;
   const activeIndex = links.findIndex((link) => link.id === active);
+  const indicatorIndex = useSlidingIndex(activeIndex);
 
   useEffect(() => {
     if (searchOpen) input.current?.focus();
@@ -97,17 +110,17 @@ export function NavBar({ user, links, active, onNavigate, suggestions, searching
 
   return (
     <div className={cn("pointer-events-none sticky top-0 z-50 flex justify-center px-4 pt-3 transition duration-500 sm:px-8", hidden && "-translate-y-[90px] opacity-0")}>
-      <nav aria-label="Główna" className="pointer-events-auto relative flex max-w-full items-center gap-2 rounded-full bg-secondary py-2 pr-2 pl-[18px] shadow-pop">
+      <nav aria-label="Główna" className="pointer-events-auto relative flex max-w-full items-center gap-2 rounded-full bg-[var(--nav-bg)] py-2 pr-2 pl-[18px] border border-[var(--nav-border)] shadow-pop backdrop-blur-[18px] backdrop-saturate-[1.6]">
         <div className="mr-4 flex items-center gap-2.5 font-display text-[15px] leading-none font-extrabold tracking-[0.06em] uppercase">
           <img src={logo} alt="Playdary" width={28} height={28} className="size-7" />
           <span aria-hidden className="hidden sm:inline">Playdary</span>
         </div>
 
-        <div className={cn("relative hidden overflow-hidden rounded-full transition-[width,opacity] duration-[400ms] sm:grid", searchOpen ? "invisible w-0 opacity-0" : "w-[330px]")} style={{ gridTemplateColumns: `repeat(${links.length}, 1fr)` }}>
+        <div className={cn("relative hidden overflow-hidden rounded-full transition-[width,opacity] duration-[400ms] sm:grid", searchOpen ? "invisible w-0 opacity-0" : "w-[372px]")} style={{ gridTemplateColumns: `repeat(${links.length}, minmax(0, 1fr))` }}>
           <span
             aria-hidden
-            className={cn("absolute inset-y-0 left-0 rounded-full bg-accent transition-transform duration-[450ms] ease-[cubic-bezier(0.3,1.25,0.5,1)]", activeIndex < 0 && "invisible")}
-            style={{ width: `${100 / links.length}%`, transform: `translateX(${Math.max(0, activeIndex) * 100}%)` }}
+            className={cn("absolute inset-y-0 left-0 rounded-full bg-accent transition-transform duration-[450ms] ease-[cubic-bezier(0.3,1.25,0.5,1)]", activeIndex < 0 && "opacity-0")}
+            style={{ width: `${100 / links.length}%`, transform: `translateX(${Math.max(0, indicatorIndex) * 100}%)` }}
           />
           {links.map((link) => (
             <button

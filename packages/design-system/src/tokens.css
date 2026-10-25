@@ -2,6 +2,8 @@
 @import "@fontsource-variable/dm-sans";
 
 :root {
+  --nav-bg: rgb(27 27 32 / 0.55);
+  --nav-border: rgb(255 255 255 / 0.1);
   --background: #000000;
   --foreground: #ffffff;
   --card: #0c0c0f;
@@ -36,6 +38,8 @@
 }
 
 .light {
+  --nav-bg: rgb(238 238 241 / 0.62);
+  --nav-border: rgb(0 0 0 / 0.08);
   --background: #ffffff;
   --foreground: #09090b;
   --card: #f7f7f8;
