@@ -96,6 +96,7 @@ function Home() {
               games={top.data}
               following={(id) => follows.data?.has(id) ?? false}
               list={(id) => lists.data?.[id] ?? null}
+              friend={(id) => friends?.[id]}
               onFollow={(id, follow) => toggleFollow.mutate({ gameId: id, follow })}
               onListChange={(id, list) => setList.mutate({ gameId: id, list })}
               onOpen={open}

@@ -58,7 +58,8 @@ export function QuoteHero({ user, quotes, interval = 9000, compact = false, onOp
             {user}
           </strong>
         </span>
-        <h1 key={index} ref={quoteRef} aria-label={quote.text} className={compact ? "max-w-[60ch] font-display text-[clamp(18px,4.6vw,24px)] leading-[1.25] font-bold tracking-tight" : "max-w-[45ch] font-display text-[clamp(36px,9vw,56px)] leading-[1.04] font-extrabold tracking-tight"}>
+        <h1 key={index} ref={quoteRef} aria-label={quote.text} className={compact ? "max-w-[60ch] font-display text-[clamp(17px,4.6vw,19px)] leading-[1.35] font-semibold tracking-tight" : "max-w-[45ch] font-display text-[clamp(36px,9vw,56px)] leading-[1.04] font-extrabold tracking-tight"}>
+          {compact && <span aria-hidden>„</span>}
           {quote.text.split(" ").map((word, i) => (
             <Fragment key={i}>
               {i > 0 && " "}
@@ -67,15 +68,23 @@ export function QuoteHero({ user, quotes, interval = 9000, compact = false, onOp
               </span>
             </Fragment>
           ))}
+          {compact && <span aria-hidden>”</span>}
+          {compact && (
+            <button type="button" aria-label={`Zobacz grę: ${quote.game}`} onClick={onOpenGame} className="ml-2 font-sans text-[13px] leading-[18px] font-medium text-muted-foreground hover:text-primary focus-visible:text-primary">
+              {quote.game} · {quote.year} →
+            </button>
+          )}
         </h1>
         <div className="flex flex-wrap items-center gap-x-6 gap-y-4">
-          <span className="inline-flex items-center gap-2.5 text-sm leading-5 font-semibold text-muted-foreground before:h-[3px] before:w-7 before:rounded-sm before:bg-foreground">
-            {quote.game} · {quote.year}
-          </span>
           {!compact && (
-            <Button variant="secondary" onClick={onOpenGame}>
-              Zobacz grę
-            </Button>
+            <>
+              <span className="inline-flex items-center gap-2.5 text-sm leading-5 font-semibold text-muted-foreground before:h-[3px] before:w-7 before:rounded-sm before:bg-foreground">
+                {quote.game} · {quote.year}
+              </span>
+              <Button variant="secondary" onClick={onOpenGame}>
+                Zobacz grę
+              </Button>
+            </>
           )}
           {quotes.length > 1 && (
             <Button variant="ghost" size="sm" aria-label="Losuj cytat" title="Losuj cytat" onClick={showRandom} className="size-8 px-0 text-muted-foreground opacity-40 hover:opacity-100 focus-visible:opacity-100">
