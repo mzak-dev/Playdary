@@ -16,6 +16,8 @@ export type GameRow = {
   genres: string[] | null;
   themes: string[] | null;
   platforms: string[] | null;
+  summary?: string | null;
+  developer?: string | null;
 };
 
 const PAGE_SIZE = 24;
@@ -33,6 +35,8 @@ export const toGame = (row: GameRow): Game => ({
   score: row.score === null ? null : Math.round(row.score),
   hypes: row.hypes,
   cover: row.cover,
+  summary: row.summary,
+  developer: row.developer,
 });
 
 type Result = { data: unknown; error: { message: string } | null };
@@ -42,13 +46,15 @@ const toGames = ({ data, error }: Result) => {
   return ((data ?? []) as GameRow[]).map(toGame);
 };
 
+const FEATURED_COLUMNS = `${GAME_COLUMNS}, summary:data->>summary, developer:details->developers->>0`;
+
 const games = () => supabase.from("games").select(GAME_COLUMNS);
 
 export const useTopUpcoming = () =>
   useQuery({
     queryKey: ["games", "top-upcoming"],
     staleTime: STALE_TIME,
-    queryFn: async () => toGames(await games().gt("release_date", Date.now()).order("hypes", { ascending: false }).limit(10)),
+    queryFn: async () => toGames(await supabase.from("games").select(FEATURED_COLUMNS).gt("release_date", Date.now()).order("hypes", { ascending: false }).limit(10)),
   });
 
 export const useTicker = () =>

@@ -9,6 +9,8 @@ export type Game = {
   score: number | null;
   hypes: number;
   cover: string | null;
+  summary?: string | null;
+  developer?: string | null;
 };
 
 export type Friend = {
